@@ -256,4 +256,4 @@ var visit = function(node, visitor){
 	})(new NodeWrapper(node), visitor);
 };
 
-module.exports = visit;
+export {visit};

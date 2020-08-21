@@ -4,7 +4,7 @@ var fs = require('fs');
 var addCaseForScript = async function(script){
 	var tree = acorn.parse(script);
 	var casesJson = await new Promise(function(res, rej){
-		fs.readFile('cases.json', 'utf8', function(err, data){
+		fs.readFile('visitor-cases.json', 'utf8', function(err, data){
 			if(err){
 				rej(err);
 			}else{
@@ -29,7 +29,7 @@ var addCaseForScript = async function(script){
 	});
 	casesJson = JSON.stringify(cases, undefined, 1);
 	await new Promise(function(res, rej){
-		fs.writeFile('cases.json', casesJson, 'utf8', function(err){
+		fs.writeFile('visitor-cases.json', casesJson, 'utf8', function(err){
 			if(err){
 				rej(err);
 			}else{

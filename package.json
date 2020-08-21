@@ -1,0 +1,28 @@
+{
+  "name": "esemantic",
+  "version": "0.1.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "rollup --config rollup.config.js",
+    "test": "npm run prepare-visitor-cases && jest",
+    "prepare-visitor-cases": "node test/prepare-visitor-cases.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/emilefokkema/esemantic.git"
+  },
+  "author": "Emile Fokkema",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/emilefokkema/esemantic/issues"
+  },
+  "homepage": "https://github.com/emilefokkema/esemantic#readme",
+  "devDependencies": {
+    "@babel/core": "^7.11.4",
+    "@babel/preset-env": "^7.11.0",
+    "babel-jest": "^26.3.0",
+    "jest": "^26.4.1",
+    "rollup": "^2.26.4"
+  }
+}
