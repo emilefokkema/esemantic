@@ -2510,5 +2510,627 @@
     ]
    }
   ]
+ },
+ {
+  "script": "var {a} = b;",
+  "tree": {
+   "type": "Program",
+   "start": 0,
+   "end": 12,
+   "body": [
+    {
+     "type": "VariableDeclaration",
+     "start": 0,
+     "end": 12,
+     "declarations": [
+      {
+       "type": "VariableDeclarator",
+       "start": 4,
+       "end": 11,
+       "id": {
+        "type": "ObjectPattern",
+        "start": 4,
+        "end": 7,
+        "properties": [
+         {
+          "type": "Property",
+          "start": 5,
+          "end": 6,
+          "method": false,
+          "shorthand": true,
+          "computed": false,
+          "key": {
+           "type": "Identifier",
+           "start": 5,
+           "end": 6,
+           "name": "a"
+          },
+          "kind": "init",
+          "value": {
+           "type": "Identifier",
+           "start": 5,
+           "end": 6,
+           "name": "a"
+          }
+         }
+        ]
+       },
+       "init": {
+        "type": "Identifier",
+        "start": 10,
+        "end": 11,
+        "name": "b"
+       }
+      }
+     ],
+     "kind": "var"
+    }
+   ],
+   "sourceType": "script"
+  },
+  "visitorCases": [
+   {
+    "methods": [
+     {
+      "methodName": "Identifier",
+      "expectedNodeTypes": [
+       "Identifier",
+       "Identifier",
+       "Identifier"
+      ]
+     }
+    ]
+   },
+   {
+    "methods": [
+     {
+      "methodName": "Property",
+      "expectedNodeTypes": [
+       "Property"
+      ]
+     }
+    ]
+   },
+   {
+    "methods": [
+     {
+      "methodName": "AssignmentProperty",
+      "expectedNodeTypes": [
+       "Property"
+      ]
+     }
+    ]
+   },
+   {
+    "methods": [
+     {
+      "methodName": "Property",
+      "expectedNodeTypes": []
+     },
+     {
+      "methodName": "AssignmentProperty",
+      "expectedNodeTypes": [
+       "Property"
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "script": "var [a] = b;",
+  "tree": {
+   "type": "Program",
+   "start": 0,
+   "end": 12,
+   "body": [
+    {
+     "type": "VariableDeclaration",
+     "start": 0,
+     "end": 12,
+     "declarations": [
+      {
+       "type": "VariableDeclarator",
+       "start": 4,
+       "end": 11,
+       "id": {
+        "type": "ArrayPattern",
+        "start": 4,
+        "end": 7,
+        "elements": [
+         {
+          "type": "Identifier",
+          "start": 5,
+          "end": 6,
+          "name": "a"
+         }
+        ]
+       },
+       "init": {
+        "type": "Identifier",
+        "start": 10,
+        "end": 11,
+        "name": "b"
+       }
+      }
+     ],
+     "kind": "var"
+    }
+   ],
+   "sourceType": "script"
+  },
+  "visitorCases": [
+   {
+    "methods": [
+     {
+      "methodName": "Identifier",
+      "expectedNodeTypes": [
+       "Identifier",
+       "Identifier"
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "script": "function a(...b){}",
+  "tree": {
+   "type": "Program",
+   "start": 0,
+   "end": 18,
+   "body": [
+    {
+     "type": "FunctionDeclaration",
+     "start": 0,
+     "end": 18,
+     "id": {
+      "type": "Identifier",
+      "start": 9,
+      "end": 10,
+      "name": "a"
+     },
+     "expression": false,
+     "generator": false,
+     "async": false,
+     "params": [
+      {
+       "type": "RestElement",
+       "start": 11,
+       "end": 15,
+       "argument": {
+        "type": "Identifier",
+        "start": 14,
+        "end": 15,
+        "name": "b"
+       }
+      }
+     ],
+     "body": {
+      "type": "BlockStatement",
+      "start": 16,
+      "end": 18,
+      "body": []
+     }
+    }
+   ],
+   "sourceType": "script"
+  },
+  "visitorCases": [
+   {
+    "methods": [
+     {
+      "methodName": "Identifier",
+      "expectedNodeTypes": [
+       "Identifier",
+       "Identifier"
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "script": "function a(b = 2){}",
+  "tree": {
+   "type": "Program",
+   "start": 0,
+   "end": 19,
+   "body": [
+    {
+     "type": "FunctionDeclaration",
+     "start": 0,
+     "end": 19,
+     "id": {
+      "type": "Identifier",
+      "start": 9,
+      "end": 10,
+      "name": "a"
+     },
+     "expression": false,
+     "generator": false,
+     "async": false,
+     "params": [
+      {
+       "type": "AssignmentPattern",
+       "start": 11,
+       "end": 16,
+       "left": {
+        "type": "Identifier",
+        "start": 11,
+        "end": 12,
+        "name": "b"
+       },
+       "right": {
+        "type": "Literal",
+        "start": 15,
+        "end": 16,
+        "value": 2,
+        "raw": "2"
+       }
+      }
+     ],
+     "body": {
+      "type": "BlockStatement",
+      "start": 17,
+      "end": 19,
+      "body": []
+     }
+    }
+   ],
+   "sourceType": "script"
+  },
+  "visitorCases": [
+   {
+    "methods": [
+     {
+      "methodName": "Identifier",
+      "expectedNodeTypes": [
+       "Identifier",
+       "Identifier"
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "script": "class A extends B{f(){}}",
+  "tree": {
+   "type": "Program",
+   "start": 0,
+   "end": 24,
+   "body": [
+    {
+     "type": "ClassDeclaration",
+     "start": 0,
+     "end": 24,
+     "id": {
+      "type": "Identifier",
+      "start": 6,
+      "end": 7,
+      "name": "A"
+     },
+     "superClass": {
+      "type": "Identifier",
+      "start": 16,
+      "end": 17,
+      "name": "B"
+     },
+     "body": {
+      "type": "ClassBody",
+      "start": 17,
+      "end": 24,
+      "body": [
+       {
+        "type": "MethodDefinition",
+        "start": 18,
+        "end": 23,
+        "kind": "method",
+        "static": false,
+        "computed": false,
+        "key": {
+         "type": "Identifier",
+         "start": 18,
+         "end": 19,
+         "name": "f"
+        },
+        "value": {
+         "type": "FunctionExpression",
+         "start": 19,
+         "end": 23,
+         "id": null,
+         "expression": false,
+         "generator": false,
+         "async": false,
+         "params": [],
+         "body": {
+          "type": "BlockStatement",
+          "start": 21,
+          "end": 23,
+          "body": []
+         }
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "sourceType": "script"
+  },
+  "visitorCases": [
+   {
+    "methods": [
+     {
+      "methodName": "Identifier",
+      "expectedNodeTypes": [
+       "Identifier",
+       "Identifier",
+       "Identifier"
+      ]
+     }
+    ]
+   },
+   {
+    "methods": [
+     {
+      "methodName": "Class",
+      "expectedNodeTypes": [
+       "ClassDeclaration"
+      ]
+     }
+    ]
+   },
+   {
+    "methods": [
+     {
+      "methodName": "Declaration",
+      "expectedNodeTypes": [
+       "ClassDeclaration"
+      ]
+     }
+    ]
+   },
+   {
+    "methods": [
+     {
+      "methodName": "Class",
+      "expectedNodeTypes": []
+     },
+     {
+      "methodName": "Declaration",
+      "expectedNodeTypes": []
+     }
+    ],
+    "expectException": true
+   }
+  ]
+ },
+ {
+  "script": "class A{f(){super.g();}}",
+  "tree": {
+   "type": "Program",
+   "start": 0,
+   "end": 24,
+   "body": [
+    {
+     "type": "ClassDeclaration",
+     "start": 0,
+     "end": 24,
+     "id": {
+      "type": "Identifier",
+      "start": 6,
+      "end": 7,
+      "name": "A"
+     },
+     "superClass": null,
+     "body": {
+      "type": "ClassBody",
+      "start": 7,
+      "end": 24,
+      "body": [
+       {
+        "type": "MethodDefinition",
+        "start": 8,
+        "end": 23,
+        "kind": "method",
+        "static": false,
+        "computed": false,
+        "key": {
+         "type": "Identifier",
+         "start": 8,
+         "end": 9,
+         "name": "f"
+        },
+        "value": {
+         "type": "FunctionExpression",
+         "start": 9,
+         "end": 23,
+         "id": null,
+         "expression": false,
+         "generator": false,
+         "async": false,
+         "params": [],
+         "body": {
+          "type": "BlockStatement",
+          "start": 11,
+          "end": 23,
+          "body": [
+           {
+            "type": "ExpressionStatement",
+            "start": 12,
+            "end": 22,
+            "expression": {
+             "type": "CallExpression",
+             "start": 12,
+             "end": 21,
+             "callee": {
+              "type": "MemberExpression",
+              "start": 12,
+              "end": 19,
+              "object": {
+               "type": "Super",
+               "start": 12,
+               "end": 17
+              },
+              "property": {
+               "type": "Identifier",
+               "start": 18,
+               "end": 19,
+               "name": "g"
+              },
+              "computed": false
+             },
+             "arguments": []
+            }
+           }
+          ]
+         }
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "sourceType": "script"
+  },
+  "visitorCases": [
+   {
+    "methods": [
+     {
+      "methodName": "Identifier",
+      "expectedNodeTypes": [
+       "Identifier",
+       "Identifier",
+       "Identifier"
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "script": "var A = class {}",
+  "tree": {
+   "type": "Program",
+   "start": 0,
+   "end": 16,
+   "body": [
+    {
+     "type": "VariableDeclaration",
+     "start": 0,
+     "end": 16,
+     "declarations": [
+      {
+       "type": "VariableDeclarator",
+       "start": 4,
+       "end": 16,
+       "id": {
+        "type": "Identifier",
+        "start": 4,
+        "end": 5,
+        "name": "A"
+       },
+       "init": {
+        "type": "ClassExpression",
+        "start": 8,
+        "end": 16,
+        "id": null,
+        "superClass": null,
+        "body": {
+         "type": "ClassBody",
+         "start": 14,
+         "end": 16,
+         "body": []
+        }
+       }
+      }
+     ],
+     "kind": "var"
+    }
+   ],
+   "sourceType": "script"
+  },
+  "visitorCases": [
+   {
+    "methods": [
+     {
+      "methodName": "Identifier",
+      "expectedNodeTypes": [
+       "Identifier"
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "script": "function a(){new.target}",
+  "tree": {
+   "type": "Program",
+   "start": 0,
+   "end": 24,
+   "body": [
+    {
+     "type": "FunctionDeclaration",
+     "start": 0,
+     "end": 24,
+     "id": {
+      "type": "Identifier",
+      "start": 9,
+      "end": 10,
+      "name": "a"
+     },
+     "expression": false,
+     "generator": false,
+     "async": false,
+     "params": [],
+     "body": {
+      "type": "BlockStatement",
+      "start": 12,
+      "end": 24,
+      "body": [
+       {
+        "type": "ExpressionStatement",
+        "start": 13,
+        "end": 23,
+        "expression": {
+         "type": "MetaProperty",
+         "start": 13,
+         "end": 23,
+         "meta": {
+          "type": "Identifier",
+          "start": 13,
+          "end": 16,
+          "name": "new"
+         },
+         "property": {
+          "type": "Identifier",
+          "start": 17,
+          "end": 23,
+          "name": "target"
+         }
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "sourceType": "script"
+  },
+  "visitorCases": [
+   {
+    "methods": [
+     {
+      "methodName": "Identifier",
+      "expectedNodeTypes": [
+       "Identifier",
+       "Identifier",
+       "Identifier"
+      ]
+     }
+    ]
+   }
+  ]
  }
 ]

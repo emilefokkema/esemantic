@@ -37,7 +37,7 @@ class Interface{
 		return distinct(mapMany(selfAndParents, function(t){return t.getChildrenFn(n.node);}));
 	}
 	descendsFrom(typeName){
-		return this.getSelfAndParents().findIndex(function(t){return t.name === typeName;});
+		return this.getSelfAndParents().findIndex(function(t){return t.name === typeName;}) > -1;
 	}
 	hasChild(t){
 		for(var child of this.childInterfaces){
@@ -230,14 +230,24 @@ collection.addNodeType("NewExpression", "NewExpression", function(n){return n.ar
 collection.addNodeType("SequenceExpression", "SequenceExpression", function(n){return n.expressions;}, ["Expression"]);
 //es2015
 collection.addNodeType("ForOfStatement", "ForOfStatement", noChildren, ["ForInStatement"]);
-//todo super
+collection.addNodeType("Super", "Super", noChildren, ["Node"]);
 collection.addNodeType("SpreadElement", "SpreadElement", function(n){return [n.argument];}, ["Node"]);
 collection.addNodeType("ArrowFunctionExpression", "ArrowFunctionExpression", noChildren, ["Function", "Expression"]);
 collection.addNodeType("YieldExpression", "YieldExpression", function(n){return [n.argument];}, ["Expression"]);
 collection.addNodeType("TemplateLiteral", "TemplateLiteral", function(n){return n.quasis.concat(n.expressions);}, ["Expression"]);
 collection.addNodeType("TaggedTemplateExpression", "TaggedTemplateExpression", function(n){return [n.tag, n.quasi];}, ["Expression"]);
 collection.addNodeType("TemplateElement", "TemplateElement", noChildren, ["Node"]);
-
+collection.addNodeType("ObjectPattern", "ObjectPattern", function(n){return n.properties;}, ["Pattern"]);
+collection.addNodeSubtype("AssignmentProperty", "Property", function(n){return n.hasParentOfType("ObjectPattern");}, noChildren, ["Property"]);
+collection.addNodeType("ArrayPattern", "ArrayPattern", function(n){return n.elements.filter(function(e){return !!e;})}, ["Pattern"]);
+collection.addNodeType("RestElement", "RestElement", function(n){return [n.argument];}, ["Pattern"]);
+collection.addNodeType("AssignmentPattern", "AssignmentPattern", function(n){return [n.left, n.right];}, ["Pattern"]);
+collection.addInterface("Class", function(n){return [n.body].concat(maybe(n.id)).concat(maybe(n.superClass));}, ["Node"]);
+collection.addNodeType("ClassBody", "ClassBody", function(n){return n.body;}, ["Node"]);
+collection.addNodeType("MethodDefinition", "MethodDefinition", function(n){return [n.key, n.value];}, ["Node"]);
+collection.addNodeType("ClassDeclaration", "ClassDeclaration", noChildren, ["Class", "Declaration"]);
+collection.addNodeType("ClassExpression", "ClassExpression", noChildren, ["Class", "Expression"]);
+collection.addNodeType("MetaProperty", "MetaProperty", function(n){return [n.meta, n.property];}, ["Expression"]);
 
 var visit = function(node, visitor){
 	(function continuation(node, visitor, parentNode){
