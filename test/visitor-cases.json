@@ -39,14 +39,13 @@
      {
       "methodName": "Node",
       "expectedNodeTypes": [
+       "ExpressionStatement",
        "Literal"
       ]
      },
      {
       "methodName": "Statement",
-      "expectedNodeTypes": [
-       "ExpressionStatement"
-      ]
+      "expectedNodeTypes": []
      }
     ]
    },
@@ -64,9 +63,7 @@
      },
      {
       "methodName": "Statement",
-      "expectedNodeTypes": [
-       "ExpressionStatement"
-      ]
+      "expectedNodeTypes": []
      }
     ]
    },
@@ -80,9 +77,7 @@
      },
      {
       "methodName": "Statement",
-      "expectedNodeTypes": [
-       "ExpressionStatement"
-      ]
+      "expectedNodeTypes": []
      }
     ]
    },
@@ -91,14 +86,13 @@
      {
       "methodName": "Node",
       "expectedNodeTypes": [
+       "ExpressionStatement",
        "Literal"
       ]
      },
      {
       "methodName": "ExpressionStatement",
-      "expectedNodeTypes": [
-       "ExpressionStatement"
-      ]
+      "expectedNodeTypes": []
      }
     ]
    },
@@ -107,6 +101,7 @@
      {
       "methodName": "Node",
       "expectedNodeTypes": [
+       "ExpressionStatement",
        "Literal"
       ]
      },
@@ -116,9 +111,7 @@
      },
      {
       "methodName": "ExpressionStatement",
-      "expectedNodeTypes": [
-       "ExpressionStatement"
-      ]
+      "expectedNodeTypes": []
      }
     ]
    },
@@ -3540,6 +3533,205 @@
       "methodName": "AnonymousDefaultExportedFunctionDeclaration",
       "expectedNodeTypes": [
        "FunctionDeclaration"
+      ]
+     }
+    ]
+   },
+   {
+    "methods": [
+     {
+      "methodName": "FunctionDeclaration",
+      "expectedNodeTypes": []
+     }
+    ]
+   },
+   {
+    "methods": [
+     {
+      "methodName": "Function",
+      "expectedNodeTypes": [
+       "FunctionDeclaration"
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "script": "export default function a(){}",
+  "tree": {
+   "type": "Program",
+   "start": 0,
+   "end": 29,
+   "body": [
+    {
+     "type": "ExportDefaultDeclaration",
+     "start": 0,
+     "end": 29,
+     "declaration": {
+      "type": "FunctionDeclaration",
+      "start": 15,
+      "end": 29,
+      "id": {
+       "type": "Identifier",
+       "start": 24,
+       "end": 25,
+       "name": "a"
+      },
+      "expression": false,
+      "generator": false,
+      "async": false,
+      "params": [],
+      "body": {
+       "type": "BlockStatement",
+       "start": 27,
+       "end": 29,
+       "body": []
+      }
+     }
+    }
+   ],
+   "sourceType": "module"
+  },
+  "visitorCases": [
+   {
+    "methods": [
+     {
+      "methodName": "FunctionDeclaration",
+      "expectedNodeTypes": [
+       "FunctionDeclaration"
+      ]
+     },
+     {
+      "methodName": "AnonymousDefaultExportedFunctionDeclaration",
+      "expectedNodeTypes": []
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "script": "export default class {constructor(){}}",
+  "tree": {
+   "type": "Program",
+   "start": 0,
+   "end": 38,
+   "body": [
+    {
+     "type": "ExportDefaultDeclaration",
+     "start": 0,
+     "end": 38,
+     "declaration": {
+      "type": "ClassDeclaration",
+      "start": 15,
+      "end": 38,
+      "id": null,
+      "superClass": null,
+      "body": {
+       "type": "ClassBody",
+       "start": 21,
+       "end": 38,
+       "body": [
+        {
+         "type": "MethodDefinition",
+         "start": 22,
+         "end": 37,
+         "kind": "constructor",
+         "static": false,
+         "computed": false,
+         "key": {
+          "type": "Identifier",
+          "start": 22,
+          "end": 33,
+          "name": "constructor"
+         },
+         "value": {
+          "type": "FunctionExpression",
+          "start": 33,
+          "end": 37,
+          "id": null,
+          "expression": false,
+          "generator": false,
+          "async": false,
+          "params": [],
+          "body": {
+           "type": "BlockStatement",
+           "start": 35,
+           "end": 37,
+           "body": []
+          }
+         }
+        }
+       ]
+      }
+     }
+    }
+   ],
+   "sourceType": "module"
+  },
+  "visitorCases": [
+   {
+    "methods": [
+     {
+      "methodName": "AnonymousDefaultExportedClassDeclaration",
+      "expectedNodeTypes": [
+       "ClassDeclaration"
+      ]
+     },
+     {
+      "methodName": "Identifier",
+      "expectedNodeTypes": [
+       "Identifier"
+      ]
+     }
+    ]
+   },
+   {
+    "methods": [
+     {
+      "methodName": "ClassDeclaration",
+      "expectedNodeTypes": [
+      ]
+     },
+     {
+      "methodName": "Identifier",
+      "expectedNodeTypes": [
+       "Identifier"
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "script": "export * from 'a'",
+  "tree": {
+   "type": "Program",
+   "start": 0,
+   "end": 17,
+   "body": [
+    {
+     "type": "ExportAllDeclaration",
+     "start": 0,
+     "end": 17,
+     "source": {
+      "type": "Literal",
+      "start": 14,
+      "end": 17,
+      "value": "a",
+      "raw": "'a'"
+     }
+    }
+   ],
+   "sourceType": "module"
+  },
+  "visitorCases": [
+   {
+    "methods": [
+     {
+      "methodName": "Literal",
+      "expectedNodeTypes": [
+       "Literal"
       ]
      }
     ]

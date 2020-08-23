@@ -48,25 +48,26 @@ class Interface{
 		return false;
 	}
 }
-class NodeType extends Interface{
-	constructor(typeName, name, getChildren, parentInterfaces){
+class Type extends Interface{
+	constructor(name, test, getChildren, parentInterfaces){
 		super(name, getChildren, parentInterfaces);
-		this.typeName = typeName;
-	}
-	isAssignableFromNode(n){
-		return n.type === this.typeName;
-	}
-	isMoreSpecificThan(n){
-		return super.isMoreSpecificThan(n) || n.typeName === undefined;
-	}
-}
-class NodeSubtype extends NodeType{
-	constructor(typeName, test, name, getChildren, parentInterfaces){
-		super(typeName, name, getChildren, parentInterfaces);
 		this.test = test;
 	}
 	isAssignableFromNode(n){
-		return super.isAssignableFromNode(n) && this.test(n);
+		return this.test(n);
+	}
+	isMoreSpecificThan(n){
+		return super.isMoreSpecificThan(n) || n.test === undefined;
+	}
+}
+class NamedType extends Type{
+	constructor(typeName, name, getChildren, parentInterfaces){
+		super(name, (n) => n.type === typeName, getChildren, parentInterfaces);
+	}
+}
+class NamedSubType extends Type{
+	constructor(typeName, test, name, getChildren, parentInterfaces){
+		super(name, (n) => n.type === typeName && test(n), getChildren, parentInterfaces);
 	}
 }
 class InterfaceCollection{
@@ -97,11 +98,14 @@ class InterfaceCollection{
 	addInterface(name, getChildren, parentInterfaces){
 		this.add(parentInterfaces, function(p){return new Interface(name, getChildren, p);});
 	}
-	addNodeType(typeName, getChildren, parentInterfaces){
-		this.add(parentInterfaces, function(p){return new NodeType(typeName, typeName, getChildren, p);});
+	addType(name, test, getChildren, parentInterfaces){
+		this.add(parentInterfaces, function(p){return new Type(name, test, getChildren, p);});
 	}
-	addNodeSubtype(name, typeName, test, getChildren, parentInterfaces){
-		this.add(parentInterfaces, function(p){return new NodeSubtype(typeName, test, name, getChildren, p);});
+	addNamedType(typeName, getChildren, parentInterfaces){
+		this.add(parentInterfaces, function(p){return new NamedType(typeName, typeName, getChildren, p);});
+	}
+	addNamedSubType(name, typeName, test, getChildren, parentInterfaces){
+		this.add(parentInterfaces, function(p){return new NamedSubType(typeName, test, name, getChildren, p);});
 	}
 	getNodeType(node){
 		var types = this.interfaces.filter(function(i){return i.isAssignableFromNode(node);});
@@ -181,84 +185,85 @@ var maybe = function(n){return n ? [n] : [];};
 
 collection.addInterface("Node", noChildren, []);
 collection.addInterface("Expression", noChildren, ["Node"]);
-collection.addNodeType("Program", function(n){return n.body;}, ["Node"]);
+collection.addNamedType("Program", function(n){return n.body;}, ["Node"]);
 collection.addInterface("Statement", noChildren, ["Node"]);
 collection.addInterface("Function", function(n){return n.params.concat([n.body]).concat(maybe(n.id))}, ["Node"]);
-collection.addNodeType("ExpressionStatement", function(n){return [n.expression];}, ["Statement"]);
-collection.addNodeSubtype("Directive", "ExpressionStatement", function(n){return n.node.directive !== undefined;}, noChildren, ["ExpressionStatement"]);
-collection.addNodeType("Literal", noChildren, ["Expression"]);
-collection.addNodeType("BlockStatement", function(n){return n.body;}, ["Statement"]);
+collection.addType("ExpressionStatement", function(n){return n.type === "ExpressionStatement" && n.node.directive === undefined;}, function(n){return [n.expression];}, ["Statement"]);
+collection.addType("Directive", function(n){return n.type === "ExpressionStatement" && n.node.directive !== undefined;}, function(n){return [n.expression];}, ["Node"]);
+collection.addNamedType("Literal", noChildren, ["Expression"]);
+collection.addNamedType("BlockStatement", function(n){return n.body;}, ["Statement"]);
 collection.addInterface("Pattern", noChildren, ["Node"]);
-collection.addNodeType("Identifier", noChildren, ["Expression", "Pattern"]);
-collection.addNodeSubtype("RegExpLiteral", "Literal", function(n){return n.node.regex !== undefined;}, noChildren, ["Literal"]);
-collection.addNodeSubtype("FunctionBody", "BlockStatement", function(n){return n.hasParentOfType("Function");}, noChildren, ["BlockStatement"]);
-collection.addNodeType("EmptyStatement", noChildren, ["Statement"]);
-collection.addNodeType("DebuggerStatement", noChildren, ["Statement"]);
-collection.addNodeType("WithStatement", function(n){return [n.object, n.body];}, ["Statement"]);
-collection.addNodeType("ReturnStatement", function(n){return maybe(n.argument);}, ["Statement"]);
-collection.addNodeType("LabeledStatement", function(n){return [n.label, n.body];}, ["Statement"]);
-collection.addNodeType("BreakStatement", function(n){return maybe(n.label);}, ["Statement"]);
-collection.addNodeType("ContinueStatement", function(n){return maybe(n.label);}, ["Statement"]);
-collection.addNodeType("IfStatement", function(n){return [n.test, n.consequent].concat(maybe(n.alternate));}, ["Statement"]);
-collection.addNodeType("SwitchStatement", function(n){return n.cases.concat([n.discriminant]);}, ["Statement"]);
-collection.addNodeType("SwitchCase", function(n){return n.consequent.concat(maybe(n.test));}, ["Node"]);
-collection.addNodeType("ThrowStatement", function(n){return [n.argument];}, ["Statement"]);
-collection.addNodeType("TryStatement", function(n){return [n.block].concat(maybe(n.handler)).concat(maybe(n.finalizer));}, ["Statement"]);
-collection.addNodeType("CatchClause", function(n){return [n.param, n.body];}, ["Node"]);
-collection.addNodeType("WhileStatement", function(n){return [n.test, n.body];}, ["Statement"]);
-collection.addNodeType("DoWhileStatement", function(n){return [n.test, n.body];}, ["Statement"]);
-collection.addNodeType("ForStatement", function(n){return [n.body].concat(maybe(n.init)).concat(maybe(n.test)).concat(maybe(n.update));}, ["Statement"]);
-collection.addNodeType("ForInStatement", function(n){return [n.left, n.right, n.body];}, ["Statement"]);
+collection.addNamedType("Identifier", noChildren, ["Expression", "Pattern"]);
+collection.addNamedSubType("RegExpLiteral", "Literal", function(n){return n.node.regex !== undefined;}, noChildren, ["Literal"]);
+collection.addNamedSubType("FunctionBody", "BlockStatement", function(n){return n.hasParentOfType("Function");}, noChildren, ["BlockStatement"]);
+collection.addNamedType("EmptyStatement", noChildren, ["Statement"]);
+collection.addNamedType("DebuggerStatement", noChildren, ["Statement"]);
+collection.addNamedType("WithStatement", function(n){return [n.object, n.body];}, ["Statement"]);
+collection.addNamedType("ReturnStatement", function(n){return maybe(n.argument);}, ["Statement"]);
+collection.addNamedType("LabeledStatement", function(n){return [n.label, n.body];}, ["Statement"]);
+collection.addNamedType("BreakStatement", function(n){return maybe(n.label);}, ["Statement"]);
+collection.addNamedType("ContinueStatement", function(n){return maybe(n.label);}, ["Statement"]);
+collection.addNamedType("IfStatement", function(n){return [n.test, n.consequent].concat(maybe(n.alternate));}, ["Statement"]);
+collection.addNamedType("SwitchStatement", function(n){return n.cases.concat([n.discriminant]);}, ["Statement"]);
+collection.addNamedType("SwitchCase", function(n){return n.consequent.concat(maybe(n.test));}, ["Node"]);
+collection.addNamedType("ThrowStatement", function(n){return [n.argument];}, ["Statement"]);
+collection.addNamedType("TryStatement", function(n){return [n.block].concat(maybe(n.handler)).concat(maybe(n.finalizer));}, ["Statement"]);
+collection.addNamedType("CatchClause", function(n){return [n.param, n.body];}, ["Node"]);
+collection.addNamedType("WhileStatement", function(n){return [n.test, n.body];}, ["Statement"]);
+collection.addNamedType("DoWhileStatement", function(n){return [n.test, n.body];}, ["Statement"]);
+collection.addNamedType("ForStatement", function(n){return [n.body].concat(maybe(n.init)).concat(maybe(n.test)).concat(maybe(n.update));}, ["Statement"]);
+collection.addNamedType("ForInStatement", function(n){return [n.left, n.right, n.body];}, ["Statement"]);
 collection.addInterface("Declaration", noChildren, ["Statement"]);
-collection.addNodeType("FunctionDeclaration", noChildren, ["Function", "Declaration"]);
-collection.addNodeType("VariableDeclaration", function(n){return n.declarations;}, ["Declaration"]);
-collection.addNodeType("VariableDeclarator", function(n){return [n.id].concat(maybe(n.init));}, ["Node"]);
-collection.addNodeType("ThisExpression", noChildren, ["Expression"]);
-collection.addNodeType("ArrayExpression", function(n){return n.elements.filter(function(e){return !!e;})}, ["Expression"]);
-collection.addNodeType("ObjectExpression", function(n){return n.properties;}, ["Expression"]);
-collection.addNodeType("Property", function(n){return [n.key, n.value];}, ["Node"]);
-collection.addNodeType("FunctionExpression", noChildren, ["Function", "Expression"]);
-collection.addNodeType("UnaryExpression", function(n){return [n.argument];}, ["Expression"]);
-collection.addNodeType("UpdateExpression", function(n){return [n.argument];}, ["Expression"]);
-collection.addNodeType("BinaryExpression", function(n){return [n.left, n.right];}, ["Expression"]);
-collection.addNodeType("AssignmentExpression", function(n){return [n.left, n.right];}, ["Expression"]);
-collection.addNodeType("LogicalExpression", function(n){return [n.left, n.right];}, ["Expression"]);
-collection.addNodeType("MemberExpression", function(n){return [n.object, n.property];}, ["Expression", "Pattern"]);
-collection.addNodeType("ConditionalExpression", function(n){return [n.test, n.alternate, n.consequent];}, ["Expression"]);
-collection.addNodeType("CallExpression", function(n){return n.arguments.concat([n.callee]);}, ["Expression"]);
-collection.addNodeType("NewExpression", function(n){return n.arguments.concat([n.callee]);}, ["Expression"]);
-collection.addNodeType("SequenceExpression", function(n){return n.expressions;}, ["Expression"]);
+collection.addType("FunctionDeclaration", function(n){return n.type === "FunctionDeclaration" && n.node.id !== null;}, noChildren, ["Function", "Declaration"]);
+collection.addNamedType("VariableDeclaration", function(n){return n.declarations;}, ["Declaration"]);
+collection.addNamedType("VariableDeclarator", function(n){return [n.id].concat(maybe(n.init));}, ["Node"]);
+collection.addNamedType("ThisExpression", noChildren, ["Expression"]);
+collection.addNamedType("ArrayExpression", function(n){return n.elements.filter(function(e){return !!e;})}, ["Expression"]);
+collection.addNamedType("ObjectExpression", function(n){return n.properties;}, ["Expression"]);
+collection.addNamedType("Property", function(n){return [n.key, n.value];}, ["Node"]);
+collection.addNamedType("FunctionExpression", noChildren, ["Function", "Expression"]);
+collection.addNamedType("UnaryExpression", function(n){return [n.argument];}, ["Expression"]);
+collection.addNamedType("UpdateExpression", function(n){return [n.argument];}, ["Expression"]);
+collection.addNamedType("BinaryExpression", function(n){return [n.left, n.right];}, ["Expression"]);
+collection.addNamedType("AssignmentExpression", function(n){return [n.left, n.right];}, ["Expression"]);
+collection.addNamedType("LogicalExpression", function(n){return [n.left, n.right];}, ["Expression"]);
+collection.addNamedType("MemberExpression", function(n){return [n.object, n.property];}, ["Expression", "Pattern"]);
+collection.addNamedType("ConditionalExpression", function(n){return [n.test, n.alternate, n.consequent];}, ["Expression"]);
+collection.addNamedType("CallExpression", function(n){return n.arguments.concat([n.callee]);}, ["Expression"]);
+collection.addNamedType("NewExpression", function(n){return n.arguments.concat([n.callee]);}, ["Expression"]);
+collection.addNamedType("SequenceExpression", function(n){return n.expressions;}, ["Expression"]);
 //es2015
-collection.addNodeType("ForOfStatement", noChildren, ["ForInStatement"]);
-collection.addNodeType("Super", noChildren, ["Node"]);
-collection.addNodeType("SpreadElement", function(n){return [n.argument];}, ["Node"]);
-collection.addNodeType("ArrowFunctionExpression", noChildren, ["Function", "Expression"]);
-collection.addNodeType("YieldExpression", function(n){return [n.argument];}, ["Expression"]);
-collection.addNodeType("TemplateLiteral", function(n){return n.quasis.concat(n.expressions);}, ["Expression"]);
-collection.addNodeType("TaggedTemplateExpression", function(n){return [n.tag, n.quasi];}, ["Expression"]);
-collection.addNodeType("TemplateElement", noChildren, ["Node"]);
-collection.addNodeType("ObjectPattern", function(n){return n.properties;}, ["Pattern"]);
-collection.addNodeSubtype("AssignmentProperty", "Property", function(n){return n.hasParentOfType("ObjectPattern");}, noChildren, ["Property"]);
-collection.addNodeType("ArrayPattern", function(n){return n.elements.filter(function(e){return !!e;})}, ["Pattern"]);
-collection.addNodeType("RestElement", function(n){return [n.argument];}, ["Pattern"]);
-collection.addNodeType("AssignmentPattern", function(n){return [n.left, n.right];}, ["Pattern"]);
+collection.addNamedType("ForOfStatement", noChildren, ["ForInStatement"]);
+collection.addNamedType("Super", noChildren, ["Node"]);
+collection.addNamedType("SpreadElement", function(n){return [n.argument];}, ["Node"]);
+collection.addNamedType("ArrowFunctionExpression", noChildren, ["Function", "Expression"]);
+collection.addNamedType("YieldExpression", function(n){return [n.argument];}, ["Expression"]);
+collection.addNamedType("TemplateLiteral", function(n){return n.quasis.concat(n.expressions);}, ["Expression"]);
+collection.addNamedType("TaggedTemplateExpression", function(n){return [n.tag, n.quasi];}, ["Expression"]);
+collection.addNamedType("TemplateElement", noChildren, ["Node"]);
+collection.addNamedType("ObjectPattern", function(n){return n.properties;}, ["Pattern"]);
+collection.addNamedSubType("AssignmentProperty", "Property", function(n){return n.hasParentOfType("ObjectPattern");}, noChildren, ["Property"]);
+collection.addNamedType("ArrayPattern", function(n){return n.elements.filter(function(e){return !!e;})}, ["Pattern"]);
+collection.addNamedType("RestElement", function(n){return [n.argument];}, ["Pattern"]);
+collection.addNamedType("AssignmentPattern", function(n){return [n.left, n.right];}, ["Pattern"]);
 collection.addInterface("Class", function(n){return [n.body].concat(maybe(n.id)).concat(maybe(n.superClass));}, ["Node"]);
-collection.addNodeType("ClassBody", function(n){return n.body;}, ["Node"]);
-collection.addNodeType("MethodDefinition", function(n){return [n.key, n.value];}, ["Node"]);
-collection.addNodeType("ClassDeclaration", noChildren, ["Class", "Declaration"]);
-collection.addNodeType("ClassExpression", noChildren, ["Class", "Expression"]);
-collection.addNodeType("MetaProperty", function(n){return [n.meta, n.property];}, ["Expression"]);
+collection.addNamedType("ClassBody", function(n){return n.body;}, ["Node"]);
+collection.addNamedType("MethodDefinition", function(n){return [n.key, n.value];}, ["Node"]);
+collection.addType("ClassDeclaration", function(n){return n.type === "ClassDeclaration" && n.node.id !== null;}, noChildren, ["Class", "Declaration"]);
+collection.addNamedType("ClassExpression", noChildren, ["Class", "Expression"]);
+collection.addNamedType("MetaProperty", function(n){return [n.meta, n.property];}, ["Expression"]);
 collection.addInterface("ModuleDeclaration", noChildren, ["Node"]);
 collection.addInterface("ModuleSpecifier", function(n){return [n.local];}, ["Node"]);
-collection.addNodeType("ImportDeclaration", function(n){return [n.source].concat(n.specifiers);}, ["ModuleDeclaration"]);
-collection.addNodeType("ImportSpecifier", function(n){return [n.imported];}, ["ModuleSpecifier"]);
-collection.addNodeType("ImportDefaultSpecifier", noChildren, ["ModuleSpecifier"]);
-collection.addNodeType("ImportNamespaceSpecifier", noChildren, ["ModuleSpecifier"]);
-collection.addNodeType("ExportNamedDeclaration", function(n){return n.specifiers.concat(maybe(n.declaration)).concat(maybe(n.source))}, ["ModuleDeclaration"]);
-collection.addNodeType("ExportSpecifier", function(n){return [n.exported];}, ["ModuleSpecifier"]);
-collection.addNodeType("ExportDefaultDeclaration", function(n){return [n.declaration]}, ["ModuleDeclaration"]);
-collection.addNodeSubtype("AnonymousDefaultExportedFunctionDeclaration", "FunctionDeclaration", function(n){return n.node.id === null && n.hasParentOfType("ExportDefaultDeclaration");}, noChildren, ["FunctionDeclaration"]);
-
+collection.addNamedType("ImportDeclaration", function(n){return [n.source].concat(n.specifiers);}, ["ModuleDeclaration"]);
+collection.addNamedType("ImportSpecifier", function(n){return [n.imported];}, ["ModuleSpecifier"]);
+collection.addNamedType("ImportDefaultSpecifier", noChildren, ["ModuleSpecifier"]);
+collection.addNamedType("ImportNamespaceSpecifier", noChildren, ["ModuleSpecifier"]);
+collection.addNamedType("ExportNamedDeclaration", function(n){return n.specifiers.concat(maybe(n.declaration)).concat(maybe(n.source))}, ["ModuleDeclaration"]);
+collection.addNamedType("ExportSpecifier", function(n){return [n.exported];}, ["ModuleSpecifier"]);
+collection.addNamedType("ExportDefaultDeclaration", function(n){return [n.declaration]}, ["ModuleDeclaration"]);
+collection.addType("AnonymousDefaultExportedFunctionDeclaration", function(n){return n.type === "FunctionDeclaration" && n.node.id === null && n.hasParentOfType("ExportDefaultDeclaration");}, noChildren, ["Function"]);
+collection.addType("AnonymousDefaultExportedClassDeclaration", function(n){return n.type === "ClassDeclaration" && n.node.id === null && n.hasParentOfType("ExportDefaultDeclaration");}, noChildren, ["Class"]);
+collection.addNamedType("ExportAllDeclaration", function(n){return [n.source];}, ["ModuleDeclaration"]);
 
 
 var visit = function(node, visitor){
