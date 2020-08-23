@@ -248,6 +248,18 @@ collection.addNodeType("MethodDefinition", function(n){return [n.key, n.value];}
 collection.addNodeType("ClassDeclaration", noChildren, ["Class", "Declaration"]);
 collection.addNodeType("ClassExpression", noChildren, ["Class", "Expression"]);
 collection.addNodeType("MetaProperty", function(n){return [n.meta, n.property];}, ["Expression"]);
+collection.addInterface("ModuleDeclaration", noChildren, ["Node"]);
+collection.addInterface("ModuleSpecifier", function(n){return [n.local];}, ["Node"]);
+collection.addNodeType("ImportDeclaration", function(n){return [n.source].concat(n.specifiers);}, ["ModuleDeclaration"]);
+collection.addNodeType("ImportSpecifier", function(n){return [n.imported];}, ["ModuleSpecifier"]);
+collection.addNodeType("ImportDefaultSpecifier", noChildren, ["ModuleSpecifier"]);
+collection.addNodeType("ImportNamespaceSpecifier", noChildren, ["ModuleSpecifier"]);
+collection.addNodeType("ExportNamedDeclaration", function(n){return n.specifiers.concat(maybe(n.declaration)).concat(maybe(n.source))}, ["ModuleDeclaration"]);
+collection.addNodeType("ExportSpecifier", function(n){return [n.exported];}, ["ModuleSpecifier"]);
+collection.addNodeType("ExportDefaultDeclaration", function(n){return [n.declaration]}, ["ModuleDeclaration"]);
+collection.addNodeSubtype("AnonymousDefaultExportedFunctionDeclaration", "FunctionDeclaration", function(n){return n.node.id === null && n.hasParentOfType("ExportDefaultDeclaration");}, noChildren, ["FunctionDeclaration"]);
+
+
 
 var visit = function(node, visitor){
 	(function continuation(node, visitor, parentNode){

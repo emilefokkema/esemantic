@@ -1,8 +1,8 @@
 var acorn = require('acorn');
 var fs = require('fs');
 
-var addCaseForScript = async function(script){
-	var tree = acorn.parse(script);
+var addCaseForScript = async function(script, module){
+	var tree = module ? acorn.parse(script, {sourceType: 'module'}) : acorn.parse(script);
 	var casesJson = await new Promise(function(res, rej){
 		fs.readFile('visitor-cases.json', 'utf8', function(err, data){
 			if(err){
@@ -39,4 +39,4 @@ var addCaseForScript = async function(script){
 	});
 };
 
-addCaseForScript('function a(){new.target}').catch(function(e){console.log(e.stack);});
+addCaseForScript(`export default function(){}`, true).catch(function(e){console.log(e.stack);});
