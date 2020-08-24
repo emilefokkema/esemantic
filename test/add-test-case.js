@@ -2,7 +2,11 @@ var acorn = require('acorn');
 var fs = require('fs');
 
 var addCaseForScript = async function(script, module){
-	var tree = module ? acorn.parse(script, {sourceType: 'module'}) : acorn.parse(script);
+	var options = {ecmaVersion: 2020};
+	if(module){
+		options.sourceType = 'module';
+	}
+	var tree = acorn.parse(script, options);
 	var casesJson = await new Promise(function(res, rej){
 		fs.readFile('visitor-cases.json', 'utf8', function(err, data){
 			if(err){
@@ -39,4 +43,4 @@ var addCaseForScript = async function(script, module){
 	});
 };
 
-addCaseForScript(`100n;`).catch(function(e){console.log(e.stack);});
+addCaseForScript(`a?.b`).catch(function(e){console.log(e.stack);});

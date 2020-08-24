@@ -228,9 +228,10 @@ collection.addNamedType("UpdateExpression", function(n){return [n.argument];}, [
 collection.addNamedType("BinaryExpression", function(n){return [n.left, n.right];}, ["Expression"]);
 collection.addNamedType("AssignmentExpression", function(n){return [n.left, n.right];}, ["Expression"]);
 collection.addNamedType("LogicalExpression", function(n){return [n.left, n.right];}, ["Expression"]);
-collection.addNamedType("MemberExpression", function(n){return [n.object, n.property];}, ["Expression", "Pattern"]);
+collection.addInterface("ChainElement", noChildren, ["Node"]);
+collection.addNamedType("MemberExpression", function(n){return [n.object, n.property];}, ["Expression", "Pattern", "ChainElement"]);
 collection.addNamedType("ConditionalExpression", function(n){return [n.test, n.alternate, n.consequent];}, ["Expression"]);
-collection.addNamedType("CallExpression", function(n){return n.arguments.concat([n.callee]);}, ["Expression"]);
+collection.addNamedType("CallExpression", function(n){return n.arguments.concat([n.callee]);}, ["Expression", "ChainElement"]);
 collection.addNamedType("NewExpression", function(n){return n.arguments.concat([n.callee]);}, ["Expression"]);
 collection.addNamedType("SequenceExpression", function(n){return n.expressions;}, ["Expression"]);
 
@@ -272,7 +273,7 @@ collection.addNamedType("AwaitExpression", function(n){return [n.argument];}, ["
 
 //es2020
 collection.addNamedSubType("BigIntLiteral", "Literal", function(n){return n.node.bigint !== undefined;}, noChildren, ["Literal"]);
-
+collection.addNamedType("ChainExpression", function(n){return [n.expression];}, ["Expression"]);
 
 
 var visit = function(node, visitor){
