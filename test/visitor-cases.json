@@ -3690,8 +3690,7 @@
     "methods": [
      {
       "methodName": "ClassDeclaration",
-      "expectedNodeTypes": [
-      ]
+      "expectedNodeTypes": []
      },
      {
       "methodName": "Identifier",
@@ -3736,6 +3735,401 @@
      }
     ]
    }
+  ]
+ },
+ {
+  "script": "async function a(){return await b;}",
+  "tree": {
+   "type": "Program",
+   "start": 0,
+   "end": 35,
+   "body": [
+    {
+     "type": "FunctionDeclaration",
+     "start": 0,
+     "end": 35,
+     "id": {
+      "type": "Identifier",
+      "start": 15,
+      "end": 16,
+      "name": "a"
+     },
+     "expression": false,
+     "generator": false,
+     "async": true,
+     "params": [],
+     "body": {
+      "type": "BlockStatement",
+      "start": 18,
+      "end": 35,
+      "body": [
+       {
+        "type": "ReturnStatement",
+        "start": 19,
+        "end": 34,
+        "argument": {
+         "type": "AwaitExpression",
+         "start": 26,
+         "end": 33,
+         "argument": {
+          "type": "Identifier",
+          "start": 32,
+          "end": 33,
+          "name": "b"
+         }
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "sourceType": "script"
+  },
+  "visitorCases": [
+   {
+    "methods": [
+     {
+      "methodName": "Identifier",
+      "expectedNodeTypes": [
+       "Identifier",
+       "Identifier"
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "script": "var a = {b:c, ...d}",
+  "tree": {
+   "type": "Program",
+   "start": 0,
+   "end": 19,
+   "body": [
+    {
+     "type": "VariableDeclaration",
+     "start": 0,
+     "end": 19,
+     "declarations": [
+      {
+       "type": "VariableDeclarator",
+       "start": 4,
+       "end": 19,
+       "id": {
+        "type": "Identifier",
+        "start": 4,
+        "end": 5,
+        "name": "a"
+       },
+       "init": {
+        "type": "ObjectExpression",
+        "start": 8,
+        "end": 19,
+        "properties": [
+         {
+          "type": "Property",
+          "start": 9,
+          "end": 12,
+          "method": false,
+          "shorthand": false,
+          "computed": false,
+          "key": {
+           "type": "Identifier",
+           "start": 9,
+           "end": 10,
+           "name": "b"
+          },
+          "value": {
+           "type": "Identifier",
+           "start": 11,
+           "end": 12,
+           "name": "c"
+          },
+          "kind": "init"
+         },
+         {
+          "type": "SpreadElement",
+          "start": 14,
+          "end": 18,
+          "argument": {
+           "type": "Identifier",
+           "start": 17,
+           "end": 18,
+           "name": "d"
+          }
+         }
+        ]
+       }
+      }
+     ],
+     "kind": "var"
+    }
+   ],
+   "sourceType": "script"
+  },
+  "visitorCases": [
+   {
+    "methods": [
+     {
+      "methodName": "Identifier",
+      "expectedNodeTypes": [
+       "Identifier",
+       "Identifier",
+       "Identifier",
+       "Identifier"
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "script": "({b:c, ...d} = a)",
+  "tree": {
+   "type": "Program",
+   "start": 0,
+   "end": 17,
+   "body": [
+    {
+     "type": "ExpressionStatement",
+     "start": 0,
+     "end": 17,
+     "expression": {
+      "type": "AssignmentExpression",
+      "start": 1,
+      "end": 16,
+      "operator": "=",
+      "left": {
+       "type": "ObjectPattern",
+       "start": 1,
+       "end": 12,
+       "properties": [
+        {
+         "type": "Property",
+         "start": 2,
+         "end": 5,
+         "method": false,
+         "shorthand": false,
+         "computed": false,
+         "key": {
+          "type": "Identifier",
+          "start": 2,
+          "end": 3,
+          "name": "b"
+         },
+         "value": {
+          "type": "Identifier",
+          "start": 4,
+          "end": 5,
+          "name": "c"
+         },
+         "kind": "init"
+        },
+        {
+         "type": "RestElement",
+         "start": 7,
+         "end": 11,
+         "argument": {
+          "type": "Identifier",
+          "start": 10,
+          "end": 11,
+          "name": "d"
+         }
+        }
+       ]
+      },
+      "right": {
+       "type": "Identifier",
+       "start": 15,
+       "end": 16,
+       "name": "a"
+      }
+     }
+    }
+   ],
+   "sourceType": "script"
+  },
+  "visitorCases": [
+   {
+    "methods": [
+     {
+      "methodName": "Identifier",
+      "expectedNodeTypes": [
+       "Identifier",
+       "Identifier",
+       "Identifier",
+       "Identifier"
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "script": "try{a}catch{b;}",
+  "tree": {
+   "type": "Program",
+   "start": 0,
+   "end": 15,
+   "body": [
+    {
+     "type": "TryStatement",
+     "start": 0,
+     "end": 15,
+     "block": {
+      "type": "BlockStatement",
+      "start": 3,
+      "end": 6,
+      "body": [
+       {
+        "type": "ExpressionStatement",
+        "start": 4,
+        "end": 5,
+        "expression": {
+         "type": "Identifier",
+         "start": 4,
+         "end": 5,
+         "name": "a"
+        }
+       }
+      ]
+     },
+     "handler": {
+      "type": "CatchClause",
+      "start": 6,
+      "end": 15,
+      "param": null,
+      "body": {
+       "type": "BlockStatement",
+       "start": 11,
+       "end": 15,
+       "body": [
+        {
+         "type": "ExpressionStatement",
+         "start": 12,
+         "end": 14,
+         "expression": {
+          "type": "Identifier",
+          "start": 12,
+          "end": 13,
+          "name": "b"
+         }
+        }
+       ]
+      }
+     },
+     "finalizer": null
+    }
+   ],
+   "sourceType": "script"
+  },
+  "visitorCases": [
+   {
+    "methods": [
+     {
+      "methodName": "Identifier",
+      "expectedNodeTypes": [
+       "Identifier",
+       "Identifier"
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "script": "100n",
+  "tree": {
+    "type": "Program",
+    "start": 0,
+    "end": 4,
+    "loc": {
+      "start": {
+        "line": 1,
+        "column": 0
+      },
+      "end": {
+        "line": 1,
+        "column": 4
+      }
+    },
+    "sourceType": "module",
+    "interpreter": null,
+    "body": [
+      {
+        "type": "ExpressionStatement",
+        "start": 0,
+        "end": 4,
+        "loc": {
+          "start": {
+            "line": 1,
+            "column": 0
+          },
+          "end": {
+            "line": 1,
+            "column": 4
+          }
+        },
+        "expression": {
+          "type": "Literal",
+          "start": 0,
+          "end": 4,
+          "loc": {
+            "start": {
+              "line": 1,
+              "column": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 4
+            }
+          },
+          "extra": {
+            "rawValue": "100",
+            "raw": "100n"
+          },
+          "bigint": "100",
+          "value": null
+        }
+      }
+    ]
+  },
+  "visitorCases": [
+    {
+      "methods":[
+        {
+          "methodName": "Literal",
+          "expectedNodeTypes": [
+            "Literal"
+          ]
+        }
+      ]
+    },
+    {
+      "methods":[
+        {
+          "methodName": "BigIntLiteral",
+          "expectedNodeTypes": [
+            "Literal"
+          ]
+        }
+      ]
+    },
+    {
+      "methods":[
+        {
+          "methodName": "Literal",
+          "expectedNodeTypes": [
+          ]
+        },
+        {
+          "methodName": "BigIntLiteral",
+          "expectedNodeTypes": [
+            "Literal"
+          ]
+        }
+      ]
+    }
   ]
  }
 ]

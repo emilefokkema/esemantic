@@ -39,4 +39,4 @@ var addCaseForScript = async function(script, module){
 	});
 };
 
-addCaseForScript(`export * from 'a'`, true).catch(function(e){console.log(e.stack);});
+addCaseForScript(`100n;`).catch(function(e){console.log(e.stack);});

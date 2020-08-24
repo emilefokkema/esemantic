@@ -183,6 +183,7 @@ class NodeWrapper{
 var noChildren = function(){return [];};
 var maybe = function(n){return n ? [n] : [];};
 
+//es5
 collection.addInterface("Node", noChildren, []);
 collection.addInterface("Expression", noChildren, ["Node"]);
 collection.addNamedType("Program", function(n){return n.body;}, ["Node"]);
@@ -208,7 +209,7 @@ collection.addNamedType("SwitchStatement", function(n){return n.cases.concat([n.
 collection.addNamedType("SwitchCase", function(n){return n.consequent.concat(maybe(n.test));}, ["Node"]);
 collection.addNamedType("ThrowStatement", function(n){return [n.argument];}, ["Statement"]);
 collection.addNamedType("TryStatement", function(n){return [n.block].concat(maybe(n.handler)).concat(maybe(n.finalizer));}, ["Statement"]);
-collection.addNamedType("CatchClause", function(n){return [n.param, n.body];}, ["Node"]);
+collection.addNamedType("CatchClause", function(n){return [n.body].concat(maybe(n.param));}, ["Node"]);
 collection.addNamedType("WhileStatement", function(n){return [n.test, n.body];}, ["Statement"]);
 collection.addNamedType("DoWhileStatement", function(n){return [n.test, n.body];}, ["Statement"]);
 collection.addNamedType("ForStatement", function(n){return [n.body].concat(maybe(n.init)).concat(maybe(n.test)).concat(maybe(n.update));}, ["Statement"]);
@@ -232,6 +233,7 @@ collection.addNamedType("ConditionalExpression", function(n){return [n.test, n.a
 collection.addNamedType("CallExpression", function(n){return n.arguments.concat([n.callee]);}, ["Expression"]);
 collection.addNamedType("NewExpression", function(n){return n.arguments.concat([n.callee]);}, ["Expression"]);
 collection.addNamedType("SequenceExpression", function(n){return n.expressions;}, ["Expression"]);
+
 //es2015
 collection.addNamedType("ForOfStatement", noChildren, ["ForInStatement"]);
 collection.addNamedType("Super", noChildren, ["Node"]);
@@ -264,6 +266,13 @@ collection.addNamedType("ExportDefaultDeclaration", function(n){return [n.declar
 collection.addType("AnonymousDefaultExportedFunctionDeclaration", function(n){return n.type === "FunctionDeclaration" && n.node.id === null && n.hasParentOfType("ExportDefaultDeclaration");}, noChildren, ["Function"]);
 collection.addType("AnonymousDefaultExportedClassDeclaration", function(n){return n.type === "ClassDeclaration" && n.node.id === null && n.hasParentOfType("ExportDefaultDeclaration");}, noChildren, ["Class"]);
 collection.addNamedType("ExportAllDeclaration", function(n){return [n.source];}, ["ModuleDeclaration"]);
+
+//es2017
+collection.addNamedType("AwaitExpression", function(n){return [n.argument];}, ["Expression"]);
+
+//es2020
+collection.addNamedSubType("BigIntLiteral", "Literal", function(n){return n.node.bigint !== undefined;}, noChildren, ["Literal"]);
+
 
 
 var visit = function(node, visitor){
