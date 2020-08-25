@@ -43,4 +43,4 @@ var addCaseForScript = async function(script, module){
 	});
 };
 
-addCaseForScript(`a?.b`).catch(function(e){console.log(e.stack);});
+addCaseForScript(`export * as foo from "mod"`, true).catch(function(e){console.log(e.stack);});

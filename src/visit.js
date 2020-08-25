@@ -266,7 +266,7 @@ collection.addNamedType("ExportSpecifier", function(n){return [n.exported];}, ["
 collection.addNamedType("ExportDefaultDeclaration", function(n){return [n.declaration]}, ["ModuleDeclaration"]);
 collection.addType("AnonymousDefaultExportedFunctionDeclaration", function(n){return n.type === "FunctionDeclaration" && n.node.id === null && n.hasParentOfType("ExportDefaultDeclaration");}, noChildren, ["Function"]);
 collection.addType("AnonymousDefaultExportedClassDeclaration", function(n){return n.type === "ClassDeclaration" && n.node.id === null && n.hasParentOfType("ExportDefaultDeclaration");}, noChildren, ["Class"]);
-collection.addNamedType("ExportAllDeclaration", function(n){return [n.source];}, ["ModuleDeclaration"]);
+collection.addNamedType("ExportAllDeclaration", function(n){return [n.source].concat(maybe(n.exported));}, ["ModuleDeclaration"]);
 
 //es2017
 collection.addNamedType("AwaitExpression", function(n){return [n.argument];}, ["Expression"]);
@@ -274,7 +274,7 @@ collection.addNamedType("AwaitExpression", function(n){return [n.argument];}, ["
 //es2020
 collection.addNamedSubType("BigIntLiteral", "Literal", function(n){return n.node.bigint !== undefined;}, noChildren, ["Literal"]);
 collection.addNamedType("ChainExpression", function(n){return [n.expression];}, ["Expression"]);
-
+collection.addNamedType("ImportExpression", function(n){return [n.source];}, ["Expression"]);
 
 var visit = function(node, visitor){
 	(function continuation(node, visitor, parentNode){
