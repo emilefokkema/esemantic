@@ -1179,17 +1179,15 @@
      {
       "methodName": "Statement",
       "expectedNodeTypes": [
-       "BlockStatement",
-       "ExpressionStatement"
       ]
      },
      {
       "methodName": "Function",
       "expectedNodeTypes": [
-       "FunctionDeclaration"
       ]
      }
-    ]
+    ],
+    "expectException": true,
    },
    {
     "methods": [
@@ -4281,6 +4279,63 @@
     }
    ],
    "sourceType": "module"
+  },
+  "visitorCases": [
+   {
+    "methods": [
+     {
+      "methodName": "Identifier",
+      "expectedNodeTypes": [
+       "Identifier"
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "script": "function* a(){yield}",
+  "tree": {
+   "type": "Program",
+   "start": 0,
+   "end": 20,
+   "body": [
+    {
+     "type": "FunctionDeclaration",
+     "start": 0,
+     "end": 20,
+     "id": {
+      "type": "Identifier",
+      "start": 10,
+      "end": 11,
+      "name": "a"
+     },
+     "expression": false,
+     "generator": true,
+     "async": false,
+     "params": [],
+     "body": {
+      "type": "BlockStatement",
+      "start": 13,
+      "end": 20,
+      "body": [
+       {
+        "type": "ExpressionStatement",
+        "start": 14,
+        "end": 19,
+        "expression": {
+         "type": "YieldExpression",
+         "start": 14,
+         "end": 19,
+         "delegate": false,
+         "argument": null
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "sourceType": "script"
   },
   "visitorCases": [
    {
