@@ -103,6 +103,6 @@ export class InterfaceCollection{
 		if(!visitorMethod){
 			return visitor;
 		}
-		return visitorMethod.apply(visitor, [node]);
+		return visitorMethod.apply(visitor, [node.node]);
 	}
 }

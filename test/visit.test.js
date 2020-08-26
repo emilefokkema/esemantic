@@ -70,3 +70,82 @@ describe.each(visitorCases.map(c => [c.script, c.tree, c.visitorCases]))('when v
 		});
 	});
 });
+
+describe('when visiting a tree for a program containing two declarations', () => {
+	let tree, visitor, declarationsVisited, firstDeclaration, secondDeclaration;
+
+	beforeEach(() => {
+		//tree for `var a = 1;function b(){}`
+		tree = {
+		  "type": "Program",
+		  "start": 0,
+		  "end": 25,
+		  "body": [
+		    {
+		      "type": "VariableDeclaration",
+		      "start": 0,
+		      "end": 10,
+		      "declarations": [
+		        {
+		          "type": "VariableDeclarator",
+		          "start": 4,
+		          "end": 9,
+		          "id": {
+		            "type": "Identifier",
+		            "start": 4,
+		            "end": 5,
+		            "name": "a"
+		          },
+		          "init": {
+		            "type": "Literal",
+		            "start": 8,
+		            "end": 9,
+		            "value": 1,
+		            "raw": "1"
+		          }
+		        }
+		      ],
+		      "kind": "var"
+		    },
+		    {
+		      "type": "FunctionDeclaration",
+		      "start": 10,
+		      "end": 24,
+		      "id": {
+		        "type": "Identifier",
+		        "start": 19,
+		        "end": 20,
+		        "name": "b"
+		      },
+		      "expression": false,
+		      "generator": false,
+		      "async": false,
+		      "params": [],
+		      "body": {
+		        "type": "BlockStatement",
+		        "start": 22,
+		        "end": 24,
+		        "body": []
+		      }
+		    }
+		  ],
+		  "sourceType": "module"
+		};
+		firstDeclaration = tree.body[0];
+		secondDeclaration = tree.body[1];
+		declarationsVisited = [];
+		visitor = {
+			Declaration(node){
+				declarationsVisited.push(node);
+			}
+		};
+		visit(tree, visitor);
+	});
+
+	it('both delarations should have been visited', () => {
+		expect(declarationsVisited.length).toBe(2);
+		expect(declarationsVisited[0]).toBe(firstDeclaration);
+		expect(declarationsVisited[1]).toBe(secondDeclaration);
+	});
+
+});

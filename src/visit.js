@@ -28,14 +28,10 @@ var visit = function(node, visitor){
 		for(var child of children){
 			var childWrapped = new NodeWrapper(child, node);
 			var newVisitor = collection.getNewVisitor(childWrapped, visitor);
-			if(!newVisitor){
-				return false;
-			}
-			if(!continuation(childWrapped, newVisitor)){
-				return false;
+			if(newVisitor){
+				continuation(childWrapped, newVisitor)
 			}
 		}
-		return true;
 	})(new NodeWrapper(node), visitor);
 };
 
