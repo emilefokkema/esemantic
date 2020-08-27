@@ -110,12 +110,13 @@ describe('a program', () => {
 	});
 
 	describe('that is asked for operations', () => {
-		let variableDeclarationNode, variableDeclaratorNode, functionDeclarationNode, functionBodyNode, parameterNode;
-		let variableDeclarationOperation, variableDeclaratorOperation, functionDeclarationOperation, functionBodyOperation, parameterDeclarationOperation;
+		let variableDeclarationNode, variableDeclaratorNode, functionDeclarationNode, functionBodyNode, parameterNode, variableIdentifierNode;
+		let variableDeclarationOperation, variableDeclaratorOperation, functionDeclarationOperation, functionBodyOperation, parameterDeclarationOperation, variableAssignmentOperation;
 
 		beforeEach(() => {
 			variableDeclarationNode = tree.body[0];
 			variableDeclaratorNode = variableDeclarationNode.declarations[0];
+			variableIdentifierNode = variableDeclaratorNode.id;
 			functionDeclarationNode = tree.body[2];
 			functionBodyNode = functionDeclarationNode.body;
 			parameterNode = functionDeclarationNode.params[0];
@@ -124,6 +125,7 @@ describe('a program', () => {
 			functionDeclarationOperation = program.getOperation(functionDeclarationNode);
 			functionBodyOperation = program.getOperation(functionBodyNode);
 			parameterDeclarationOperation = program.getOperation(parameterNode);
+			variableAssignmentOperation = program.getOperation(variableIdentifierNode);
 		});
 
 		it('should return something', () => {
@@ -132,6 +134,7 @@ describe('a program', () => {
 			expect(functionDeclarationOperation).toBeTruthy();
 			expect(functionBodyOperation).toBeTruthy();
 			expect(parameterDeclarationOperation).toBeTruthy();
+			expect(variableAssignmentOperation).toBeTruthy();
 		});
 	});
 });
