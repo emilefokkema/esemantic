@@ -86,12 +86,11 @@ export class InterfaceCollection{
 	getChildren(node){
 		return this.getNodeType(node).getChildren(node);
 	}
-	findVisitorMethod(node, visitor){
-		var nodeTypes = this.getNodeType(node).getSelfAndParents();
-		var nodeTypesForWhichThereIsAMethod = nodeTypes.filter(t => !!visitor[t.name]);
+	findVisitorMethod(nodeTypeName, allTypes, visitor){
+		var nodeTypesForWhichThereIsAMethod = allTypes.filter(t => !!visitor[t.name]);
 		var mostSpecific = this.getMostSpecificTypes(nodeTypesForWhichThereIsAMethod);
 		if(mostSpecific.length > 1){
-			throw new Error(`For node of type ${node.type}, cannot decide between methods ${mostSpecific.map(t => `'${t.name}'`).join(' and ')}`);
+			throw new Error(`For node of type ${nodeTypeName}, cannot decide between methods ${mostSpecific.map(t => `'${t.name}'`).join(' and ')}`);
 		}
 		if(mostSpecific.length === 0){
 			return undefined;
@@ -99,10 +98,14 @@ export class InterfaceCollection{
 		return visitor[mostSpecific[0].name];
 	}
 	getNewVisitor(node, visitor){
-		var visitorMethod = this.findVisitorMethod(node, visitor);
+		var nodeTypes = this.getNodeType(node).getSelfAndParents();
+		return this.getNewVisitorFromNodeAndTypesAndVisitor(node, nodeTypes, visitor);
+	}
+	getNewVisitorFromNodeAndTypesAndVisitor(node, nodeTypes, visitor){
+		var visitorMethod = this.findVisitorMethod(node.type, nodeTypes, visitor);
 		if(!visitorMethod){
 			return visitor;
 		}
-		return visitorMethod.apply(visitor, [node.node]);
+		return visitorMethod.apply(visitor, [node.node, (replacingVisitor) => this.getNewVisitorFromNodeAndTypesAndVisitor(node, nodeTypes, replacingVisitor)]);
 	}
 }

@@ -149,3 +149,53 @@ describe('when visiting a tree for a program containing two declarations', () =>
 	});
 
 });
+
+describe('when replacing one visitor with another during a visit', () => {
+	let tree, variableDeclaration, visitedVariableDeclaration;
+
+	beforeEach(() => {
+		// for script `var a;`
+		tree = {
+		  "type": "Program",
+		  "start": 0,
+		  "end": 7,
+		  "body": [
+		    {
+		      "type": "VariableDeclaration",
+		      "start": 0,
+		      "end": 6,
+		      "declarations": [
+		        {
+		          "type": "VariableDeclarator",
+		          "start": 4,
+		          "end": 5,
+		          "id": {
+		            "type": "Identifier",
+		            "start": 4,
+		            "end": 5,
+		            "name": "a"
+		          },
+		          "init": null
+		        }
+		      ],
+		      "kind": "var"
+		    }
+		  ],
+		  "sourceType": "script"
+		};
+		variableDeclaration = tree.body[0];
+		visit(tree, {
+			Declaration(node1, useVisitor){
+				useVisitor({
+					VariableDeclaration(node2){
+						visitedVariableDeclaration = node2;
+					}
+				})
+			}
+		});
+	});
+
+	it('the other visitor should have been used for the same node', () => {
+		expect(visitedVariableDeclaration).toBe(variableDeclaration);
+	});
+});
