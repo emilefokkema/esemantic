@@ -189,3 +189,129 @@ describe('a program with a function with a rest element as parameter', () => {
 		expect(program.getOperation(tree.body[0].params[0])).toBeTruthy();
 	});
 });
+
+describe('a program with a function with an object pattern as parameter', () => {
+	let program, tree;
+
+	beforeEach(() => {
+		// for script `function a({b:c, d}){b;c;d;}`
+		tree = {
+			"type": "Program",
+			"start": 0,
+			"end": 29,
+			"body": [
+			  {
+				"type": "FunctionDeclaration",
+				"start": 0,
+				"end": 28,
+				"id": {
+				  "type": "Identifier",
+				  "start": 9,
+				  "end": 10,
+				  "name": "a"
+				},
+				"expression": false,
+				"generator": false,
+				"async": false,
+				"params": [
+				  {
+					"type": "ObjectPattern",
+					"start": 11,
+					"end": 19,
+					"properties": [
+					  {
+						"type": "Property",
+						"start": 12,
+						"end": 15,
+						"method": false,
+						"shorthand": false,
+						"computed": false,
+						"key": {
+						  "type": "Identifier",
+						  "start": 12,
+						  "end": 13,
+						  "name": "b"
+						},
+						"value": {
+						  "type": "Identifier",
+						  "start": 14,
+						  "end": 15,
+						  "name": "c"
+						},
+						"kind": "init"
+					  },
+					  {
+						"type": "Property",
+						"start": 17,
+						"end": 18,
+						"method": false,
+						"shorthand": true,
+						"computed": false,
+						"key": {
+						  "type": "Identifier",
+						  "start": 17,
+						  "end": 18,
+						  "name": "d"
+						},
+						"kind": "init",
+						"value": {
+						  "type": "Identifier",
+						  "start": 17,
+						  "end": 18,
+						  "name": "d"
+						}
+					  }
+					]
+				  }
+				],
+				"body": {
+				  "type": "BlockStatement",
+				  "start": 20,
+				  "end": 28,
+				  "body": [
+					{
+					  "type": "ExpressionStatement",
+					  "start": 21,
+					  "end": 23,
+					  "expression": {
+						"type": "Identifier",
+						"start": 21,
+						"end": 22,
+						"name": "b"
+					  }
+					},
+					{
+					  "type": "ExpressionStatement",
+					  "start": 23,
+					  "end": 25,
+					  "expression": {
+						"type": "Identifier",
+						"start": 23,
+						"end": 24,
+						"name": "c"
+					  }
+					},
+					{
+					  "type": "ExpressionStatement",
+					  "start": 25,
+					  "end": 27,
+					  "expression": {
+						"type": "Identifier",
+						"start": 25,
+						"end": 26,
+						"name": "d"
+					  }
+					}
+				  ]
+				}
+			  }
+			],
+			"sourceType": "script"
+		  }
+		program = Program.create(tree);
+	});
+
+	it('should have an operation for the object pattern', () => {
+		expect(program.getOperation(tree.body[0].params[0])).toBeTruthy();
+	});
+});

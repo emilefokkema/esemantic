@@ -5,14 +5,14 @@ class BlockScope{
 	constructor(){
 		this.scopeId = scopeId++;
 	}
-	addVariableDeclarator(name, variableDeclaratorOperation){
-		//console.log(`scope with id ${this.scopeId} adding variable declarator named ${name} `, variableDeclaratorOperation)
+	addVariableDeclarator(id, variableDeclaratorOperation){
+		//console.log(`scope with id ${this.scopeId} adding variable declarator named ${id.name} `, variableDeclaratorOperation)
 	}
-	addFunctionDeclaration(name, functionDeclarationOperation){
-		//console.log(`scope with id ${this.scopeId} adding function declaration named ${name} `, functionDeclarationOperation)
+	addFunctionDeclaration(id, functionDeclarationOperation){
+		//console.log(`scope with id ${this.scopeId} adding function declaration named ${id.name} `, functionDeclarationOperation)
 	}
-	addParameterDeclaration(name, parameterDeclarationOperation){
-		//console.log(`scope with id ${this.scopeId} adding parameter declaration named ${name} `, parameterDeclarationOperation)
+	addParameterDeclaration(id, parameterDeclarationOperation){
+		//console.log(`scope with id ${this.scopeId} adding parameter declaration named ${id.name} `, parameterDeclarationOperation)
 	}
 	createFunctionScope(){
 		return new BlockScope();
@@ -118,7 +118,22 @@ class AssignmentTargetPatternVisitor{
 		this.onFoundName = onFoundName;
 	}
 	Identifier(node){
-		this.onFoundName(node.name);
+		this.onFoundName(node);
+	}
+	RestElement(){
+		return this;
+	}
+	ObjectPattern(){
+		return new AssignmentTargetObjectPatternVisitor(this.onFoundName);
+	}
+}
+
+class AssignmentTargetObjectPatternVisitor{
+	constructor(onFoundName){
+		this.onFoundName = onFoundName;
+	}
+	AssignmentProperty(node){
+		//console.log(`encountered assignment property `, node);
 	}
 }
 
@@ -136,7 +151,7 @@ class FunctionDeclarationVisitor{
 
 	Pattern(node, useVisitor){
 		if(node === this.functionDeclarationOperation.id){
-			this.scope.addFunctionDeclaration(node.name, this.functionDeclarationOperation);
+			this.scope.addFunctionDeclaration(node, this.functionDeclarationOperation);
 		}else{
 			var parameterDeclaration = this.functionDeclarationOperation.addParameterDeclaration(node);
 			return useVisitor(new AssignmentTargetPatternVisitor((name) => {
