@@ -186,7 +186,7 @@ describe('when replacing one visitor with another during a visit', () => {
 		variableDeclaration = tree.body[0];
 		visit(tree, {
 			Declaration(node1, useVisitor){
-				useVisitor({
+				return useVisitor({
 					VariableDeclaration(node2){
 						visitedVariableDeclaration = node2;
 					}

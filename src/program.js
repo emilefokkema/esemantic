@@ -5,8 +5,14 @@ class BlockScope{
 	constructor(){
 		this.scopeId = scopeId++;
 	}
+	addVariableDeclarator(name, variableDeclaratorOperation){
+		//console.log(`scope with id ${this.scopeId} adding variable declarator named ${name} `, variableDeclaratorOperation)
+	}
 	addFunctionDeclaration(name, functionDeclarationOperation){
 		//console.log(`scope with id ${this.scopeId} adding function declaration named ${name} `, functionDeclarationOperation)
+	}
+	addParameterDeclaration(name, parameterDeclarationOperation){
+		//console.log(`scope with id ${this.scopeId} adding parameter declaration named ${name} `, parameterDeclarationOperation)
 	}
 	createFunctionScope(){
 		return new BlockScope();
@@ -98,8 +104,21 @@ class VariableDeclaratorVisitor{
 		this.variableDeclaratorOperation = variableDeclaratorOperation;
 		this.declarationKind = declarationKind;
 	}
-	Pattern(node){
+	Pattern(node, useVisitor){
+		if(node === this.variableDeclaratorOperation.id){
+			return useVisitor(new AssignmentTargetPatternVisitor((name) => {
+				this.scope.addVariableDeclarator(name, this.variableDeclaratorOperation);
+			}));
+		}
+	}
+}
 
+class AssignmentTargetPatternVisitor{
+	constructor(onFoundName){
+		this.onFoundName = onFoundName;
+	}
+	Identifier(node){
+		this.onFoundName(node.name);
 	}
 }
 
@@ -115,17 +134,15 @@ class FunctionDeclarationVisitor{
 		return new BlockVisitor(this.functionScope, functionBody);
 	}
 
-	Identifier(node){
+	Pattern(node, useVisitor){
 		if(node === this.functionDeclarationOperation.id){
 			this.scope.addFunctionDeclaration(node.name, this.functionDeclarationOperation);
 		}else{
 			var parameterDeclaration = this.functionDeclarationOperation.addParameterDeclaration(node);
+			return useVisitor(new AssignmentTargetPatternVisitor((name) => {
+				this.functionScope.addParameterDeclaration(name, parameterDeclaration);
+			}));
 		}
-		
-	}
-
-	Pattern(node){
-		var parameterDeclaration = this.functionDeclarationOperation.addParameterDeclaration(node);
 	}
 }
 
