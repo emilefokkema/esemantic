@@ -191,6 +191,11 @@ describe('a program with a function with a rest element as parameter', () => {
 	it('should have an operation for the spread element', () => {
 		expect(program.getOperation(tree.body[0].params[0])).toBeTruthy();
 	});
+
+	it('should have an operation for the spread element argument', () => {
+		var spreadElementArgumentOperation = program.getOperation(tree.body[0].params[0].argument);
+		expect(spreadElementArgumentOperation).toBeTruthy();
+	});
 });
 
 describe('a program with a function with an object pattern as parameter', () => {
@@ -316,5 +321,74 @@ describe('a program with a function with an object pattern as parameter', () => 
 
 	it('should have an operation for the object pattern', () => {
 		expect(program.getOperation(tree.body[0].params[0])).toBeTruthy();
+	});
+
+	it(`should have an operation for the object pattern's properties' values`, () => {
+		expect(program.getOperation(tree.body[0].params[0].properties[0].value)).toBeTruthy();
+		expect(program.getOperation(tree.body[0].params[0].properties[1].value)).toBeTruthy();
+	});
+});
+
+describe('a program with a function with an array pattern as a parameter', () => {
+	let program, tree;
+
+	beforeEach(() => {
+		// for script `function a([b, c]){}`
+		tree = {
+			"type": "Program",
+			"start": 0,
+			"end": 21,
+			"body": [
+			  {
+				"type": "FunctionDeclaration",
+				"start": 0,
+				"end": 20,
+				"id": {
+				  "type": "Identifier",
+				  "start": 9,
+				  "end": 10,
+				  "name": "a"
+				},
+				"expression": false,
+				"generator": false,
+				"async": false,
+				"params": [
+				  {
+					"type": "ArrayPattern",
+					"start": 11,
+					"end": 17,
+					"elements": [
+					  {
+						"type": "Identifier",
+						"start": 12,
+						"end": 13,
+						"name": "b"
+					  },
+					  {
+						"type": "Identifier",
+						"start": 15,
+						"end": 16,
+						"name": "c"
+					  }
+					]
+				  }
+				],
+				"body": {
+				  "type": "BlockStatement",
+				  "start": 18,
+				  "end": 20,
+				  "body": []
+				}
+			  }
+			],
+			"sourceType": "script"
+		  };
+		program = Program.create(tree);
+	});
+
+	fit('should have a operation for the array pattern', () => {
+		var arrayPatternOperation = program.getOperation(tree.body[0].params[0]);
+		console.log(arrayPatternOperation);
+		expect(arrayPatternOperation).toBeTruthy();
 	});
 });

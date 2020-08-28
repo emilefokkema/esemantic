@@ -57,17 +57,35 @@ class AssignmentOperation extends Operation{
 		this.childOperations.push(objectAssignment);
 		return objectAssignment;
 	}
+	addArrayDestructuringAssignment(tree){
+
+	}
 }
 
-class ObjectDestructuringAssignmentOperation extends AssignmentOperation{
+class ObjectDestructuringAssignmentOperation extends Operation{
+	addPropertyDestructuringAssignment(tree){
+		var propertyAssignment = new PropertyDestructuringAssignmentOperation(tree);
+		this.childOperations.push(propertyAssignment);
+		return propertyAssignment;
+	}
+}
 
+class ArrayDestructuringAssignmentOperation extends Operation{
+
+}
+
+class PropertyDestructuringAssignmentOperation extends AssignmentOperation{
+	constructor(tree){
+		super(tree);
+		this.key = tree.key;
+	}
 }
 
 class RestElementAssignmentOperation extends AssignmentOperation{
 
 }
 
-class SymbolAssignmentOperation extends AssignmentOperation{
+class SymbolAssignmentOperation extends Operation{
 
 }
 
@@ -178,6 +196,24 @@ class AssignmentTargetPatternVisitor{
 		var objectAssignment = this.assignmentOperation.addObjectDestructuringAssignment(node);
 		return new ObjectPatternVisitor(objectAssignment, this.sourceScope, this.targetScope);
 	}
+	ArrayPattern(node){
+		var arrayAssignment = this.assignmentOperation.addArrayDestructuringAssignment(node);
+		return new ArrayPatternVisitor(arrayAssignment, this.sourceScope, this.targetScope);
+	}
+}
+
+class PropertyAssignmentVisitor{
+	constructor(propertyDestructuringAssignmentOperation, sourceScope, targetScope){
+		this.propertyDestructuringAssignmentOperation = propertyDestructuringAssignmentOperation;
+		this.sourceScope = sourceScope;
+		this.targetScope = targetScope;
+	}
+	Pattern(node, useVisitor){
+		if(node === this.propertyDestructuringAssignmentOperation.key){
+			return;
+		}
+		return useVisitor(new AssignmentTargetPatternVisitor(this.propertyDestructuringAssignmentOperation, this.sourceScope, this.targetScope));
+	}
 }
 
 class ObjectPatternVisitor{
@@ -187,7 +223,19 @@ class ObjectPatternVisitor{
 		this.targetScope = targetScope;
 	}
 	Property(node){
-		
+		var propertyAssignment = this.objectDestructuringAssignmentOperation.addPropertyDestructuringAssignment(node);
+		return new PropertyAssignmentVisitor(propertyAssignment, this.sourceScope, this.targetScope);
+	}
+}
+
+class ArrayPatternVisitor{
+	constructor(arrayDestructuringAssignmentOperation, sourceScope, targetScope){
+		this.arrayDestructuringAssignmentOperation = arrayDestructuringAssignmentOperation;
+		this.sourceScope = sourceScope;
+		this.targetScope = targetScope;
+	}
+	Pattern(node, useVisitor){
+		return useVisitor(new AssignmentTargetPatternVisitor(this.arrayDestructuringAssignmentOperation, this.sourceScope, this.targetScope));
 	}
 }
 
