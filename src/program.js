@@ -27,11 +27,17 @@ class Operation{
 		this.tree = tree;
 		this.childOperations = [];
 	}
-	*getSelfAndChildren(){
-		yield this;
+	getOperation(tree){
 		for(var childOperation of this.childOperations){
-			yield* childOperation.getSelfAndChildren();
+			var childResult = childOperation.getOperation(tree);
+			if(childResult){
+				return childResult;
+			}
 		}
+		if(tree === this.tree){
+			return this;
+		}
+		return undefined;
 	}
 }
 
@@ -46,6 +52,15 @@ class AssignmentOperation extends Operation{
 		this.childOperations.push(restElementAssignment);
 		return restElementAssignment;
 	}
+	addObjectDestructuringAssignment(tree){
+		var objectAssignment = new ObjectDestructuringAssignmentOperation(tree);
+		this.childOperations.push(objectAssignment);
+		return objectAssignment;
+	}
+}
+
+class ObjectDestructuringAssignmentOperation extends AssignmentOperation{
+
 }
 
 class RestElementAssignmentOperation extends AssignmentOperation{
@@ -159,7 +174,19 @@ class AssignmentTargetPatternVisitor{
 		var restElementAssignment = this.assignmentOperation.addRestElementAssignment(node);
 		return new AssignmentTargetPatternVisitor(restElementAssignment, this.sourceScope, this.targetScope);
 	}
-	ObjectPattern(){
+	ObjectPattern(node){
+		var objectAssignment = this.assignmentOperation.addObjectDestructuringAssignment(node);
+		return new ObjectPatternVisitor(objectAssignment, this.sourceScope, this.targetScope);
+	}
+}
+
+class ObjectPatternVisitor{
+	constructor(objectDestructuringAssignmentOperation, sourceScope, targetScope){
+		this.objectDestructuringAssignmentOperation = objectDestructuringAssignmentOperation;
+		this.sourceScope = sourceScope;
+		this.targetScope = targetScope;
+	}
+	Property(node){
 		
 	}
 }
@@ -209,13 +236,6 @@ class ProgramTreeVisitor extends BlockVisitor{
 }
 
 export class Program extends BlockOperation{
-	getOperation(tree){
-		for(var operation of this.getSelfAndChildren()){
-			if(operation.tree === tree){
-				return operation;
-			}
-		}
-	}
 
 	static create(tree){
 		var globalScope = new BlockScope();
