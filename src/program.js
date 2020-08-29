@@ -6,7 +6,7 @@ class BlockScope{
 		this.scopeId = scopeId++;
 	}
 	createSymbol(id){
-		console.log(`scope with id ${this.scopeId} creating symbol for `, id);
+		//console.log(`scope with id ${this.scopeId} creating symbol for `, id);
 	}
 	// addVariableDeclarator(id, variableDeclaratorOperation){
 	// 	//console.log(`scope with id ${this.scopeId} adding variable declarator named ${id.name} `, variableDeclaratorOperation)
@@ -62,6 +62,11 @@ class AssignmentOperation extends Operation{
 		this.childOperations.push(arrayAssignment);
 		return arrayAssignment;
 	}
+	addDefaultAssignmentOperation(tree){
+		var defaultAssignment = new DefaultAssignmentOperation(tree);
+		this.childOperations.push(defaultAssignment);
+		return defaultAssignment;
+	}
 }
 
 class ObjectDestructuringAssignmentOperation extends Operation{
@@ -80,6 +85,13 @@ class PropertyDestructuringAssignmentOperation extends AssignmentOperation{
 	constructor(tree){
 		super(tree);
 		this.key = tree.key;
+	}
+}
+
+class DefaultAssignmentOperation extends AssignmentOperation{
+	constructor(tree){
+		super(tree);
+		this.left = tree.left;
 	}
 }
 
@@ -201,6 +213,23 @@ class AssignmentTargetPatternVisitor{
 	ArrayPattern(node){
 		var arrayAssignment = this.assignmentOperation.addArrayDestructuringAssignment(node);
 		return new ArrayPatternVisitor(arrayAssignment, this.sourceScope, this.targetScope);
+	}
+	AssignmentPattern(node){
+		var assignmentPattern = this.assignmentOperation.addDefaultAssignmentOperation(node);
+		return new AssignmentPatternVisitor(assignmentPattern, this.sourceScope, this.targetScope);
+	}
+}
+
+class AssignmentPatternVisitor{
+	constructor(defaultAssignmentOperation, sourceScope, targetScope){
+		this.defaultAssignmentOperation = defaultAssignmentOperation;
+		this.sourceScope = sourceScope;
+		this.targetScope = targetScope;
+	}
+	Expression(node, useVisitor){
+		if(node === this.defaultAssignmentOperation.left){
+			return useVisitor(new AssignmentTargetPatternVisitor(this.defaultAssignmentOperation, this.sourceScope, this.targetScope));
+		}
 	}
 }
 

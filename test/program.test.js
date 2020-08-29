@@ -329,7 +329,7 @@ describe('a program with a function with an object pattern as parameter', () => 
 	});
 });
 
-fdescribe('a program with a function with an array pattern as a parameter', () => {
+describe('a program with a function with an array pattern as a parameter', () => {
 	let program, tree;
 
 	beforeEach(() => {
@@ -391,10 +391,186 @@ fdescribe('a program with a function with an array pattern as a parameter', () =
 		expect(arrayPatternOperation).toBeTruthy();
 	});
 
-	fit(`should have an operation for each of the array pattern's elements`, () => {
+	it(`should have an operation for each of the array pattern's elements`, () => {
 		var arrayPatternElementOperation1 = program.getOperation(tree.body[0].params[0].elements[0]);
 		var arrayPatternElementOperation2 = program.getOperation(tree.body[0].params[0].elements[1]);
 		expect(arrayPatternElementOperation1).toBeTruthy();
 		expect(arrayPatternElementOperation2).toBeTruthy();
+	});
+});
+
+describe('a program with a functin with an assignment pattern as a parameter', () => {
+	let program, tree;
+
+	beforeEach(() => {
+		// for script `function a(b = 5){}`
+		tree = {
+			"type": "Program",
+			"start": 0,
+			"end": 20,
+			"body": [
+			  {
+				"type": "FunctionDeclaration",
+				"start": 0,
+				"end": 19,
+				"id": {
+				  "type": "Identifier",
+				  "start": 9,
+				  "end": 10,
+				  "name": "a"
+				},
+				"expression": false,
+				"generator": false,
+				"async": false,
+				"params": [
+				  {
+					"type": "AssignmentPattern",
+					"start": 11,
+					"end": 16,
+					"left": {
+					  "type": "Identifier",
+					  "start": 11,
+					  "end": 12,
+					  "name": "b"
+					},
+					"right": {
+					  "type": "Literal",
+					  "start": 15,
+					  "end": 16,
+					  "value": 5,
+					  "raw": "5"
+					}
+				  }
+				],
+				"body": {
+				  "type": "BlockStatement",
+				  "start": 17,
+				  "end": 19,
+				  "body": []
+				}
+			  }
+			],
+			"sourceType": "script"
+		  };
+		program = Program.create(tree);
+	});
+
+	it('should have an operation for the assignment pattern', () => {
+		var assignmentPatternOperation = program.getOperation(tree.body[0].params[0]);
+		expect(assignmentPatternOperation).toBeTruthy();
+	});
+
+	it(`should have an operation for the assignment pattern's left`, () => {
+		var assignmentPatternLeftOperation = program.getOperation(tree.body[0].params[0].left);
+		expect(assignmentPatternLeftOperation).toBeTruthy();
+	});
+});
+
+describe('a program containing a variable declarator with an object pattern', () => {
+	let program, tree;
+
+	beforeEach(() => {
+		// for script `var {a:b, c} = {};`
+		tree = {
+			"type": "Program",
+			"start": 0,
+			"end": 19,
+			"body": [
+			  {
+				"type": "VariableDeclaration",
+				"start": 0,
+				"end": 18,
+				"declarations": [
+				  {
+					"type": "VariableDeclarator",
+					"start": 4,
+					"end": 17,
+					"id": {
+					  "type": "ObjectPattern",
+					  "start": 4,
+					  "end": 12,
+					  "properties": [
+						{
+						  "type": "Property",
+						  "start": 5,
+						  "end": 8,
+						  "method": false,
+						  "shorthand": false,
+						  "computed": false,
+						  "key": {
+							"type": "Identifier",
+							"start": 5,
+							"end": 6,
+							"name": "a"
+						  },
+						  "value": {
+							"type": "Identifier",
+							"start": 7,
+							"end": 8,
+							"name": "b"
+						  },
+						  "kind": "init"
+						},
+						{
+						  "type": "Property",
+						  "start": 10,
+						  "end": 11,
+						  "method": false,
+						  "shorthand": true,
+						  "computed": false,
+						  "key": {
+							"type": "Identifier",
+							"start": 10,
+							"end": 11,
+							"name": "c"
+						  },
+						  "kind": "init",
+						  "value": {
+							"type": "Identifier",
+							"start": 10,
+							"end": 11,
+							"name": "c"
+						  }
+						}
+					  ]
+					},
+					"init": {
+					  "type": "ObjectExpression",
+					  "start": 15,
+					  "end": 17,
+					  "properties": []
+					}
+				  }
+				],
+				"kind": "var"
+			  }
+			],
+			"sourceType": "script"
+		  };
+		program = Program.create(tree);
+	});
+
+	it(`should have an operation for the variable declarator`, () => {
+		var declaratorOperation = program.getOperation(tree.body[0].declarations[0]);
+		expect(declaratorOperation).toBeTruthy();
+	});
+
+	it(`should have an operation for the variable declarator's id`, () => {
+		var declaratorIdOperation = program.getOperation(tree.body[0].declarations[0].id);
+		expect(declaratorIdOperation).toBeTruthy();
+	});
+
+	it(`should have an operation for each of the variable declarator's id's properties`, () => {
+		var property1Operation = program.getOperation(tree.body[0].declarations[0].id.properties[0]);
+		var property2Operation = program.getOperation(tree.body[0].declarations[0].id.properties[1]);
+		expect(property1Operation).toBeTruthy();
+		expect(property2Operation).toBeTruthy();
+	});
+
+	it(`should have an operation for each of the variable declarator's id's properties' values`, () => {
+		var property1ValueOperation = program.getOperation(tree.body[0].declarations[0].id.properties[0].value);
+		var property2ValueOperation = program.getOperation(tree.body[0].declarations[0].id.properties[1].value);
+		expect(property1ValueOperation).toBeTruthy();
+		expect(property2ValueOperation).toBeTruthy();
 	});
 });
