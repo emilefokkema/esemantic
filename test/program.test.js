@@ -329,7 +329,7 @@ describe('a program with a function with an object pattern as parameter', () => 
 	});
 });
 
-describe('a program with a function with an array pattern as a parameter', () => {
+fdescribe('a program with a function with an array pattern as a parameter', () => {
 	let program, tree;
 
 	beforeEach(() => {
@@ -386,9 +386,15 @@ describe('a program with a function with an array pattern as a parameter', () =>
 		program = Program.create(tree);
 	});
 
-	fit('should have a operation for the array pattern', () => {
+	it('should have an operation for the array pattern', () => {
 		var arrayPatternOperation = program.getOperation(tree.body[0].params[0]);
-		console.log(arrayPatternOperation);
 		expect(arrayPatternOperation).toBeTruthy();
+	});
+
+	fit(`should have an operation for each of the array pattern's elements`, () => {
+		var arrayPatternElementOperation1 = program.getOperation(tree.body[0].params[0].elements[0]);
+		var arrayPatternElementOperation2 = program.getOperation(tree.body[0].params[0].elements[1]);
+		expect(arrayPatternElementOperation1).toBeTruthy();
+		expect(arrayPatternElementOperation2).toBeTruthy();
 	});
 });

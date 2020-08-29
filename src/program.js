@@ -6,7 +6,7 @@ class BlockScope{
 		this.scopeId = scopeId++;
 	}
 	createSymbol(id){
-		//console.log(`scope with id ${this.scopeId} creating symbol for `, id);
+		console.log(`scope with id ${this.scopeId} creating symbol for `, id);
 	}
 	// addVariableDeclarator(id, variableDeclaratorOperation){
 	// 	//console.log(`scope with id ${this.scopeId} adding variable declarator named ${id.name} `, variableDeclaratorOperation)
@@ -58,7 +58,9 @@ class AssignmentOperation extends Operation{
 		return objectAssignment;
 	}
 	addArrayDestructuringAssignment(tree){
-
+		var arrayAssignment = new ArrayDestructuringAssignmentOperation(tree);
+		this.childOperations.push(arrayAssignment);
+		return arrayAssignment;
 	}
 }
 
@@ -70,7 +72,7 @@ class ObjectDestructuringAssignmentOperation extends Operation{
 	}
 }
 
-class ArrayDestructuringAssignmentOperation extends Operation{
+class ArrayDestructuringAssignmentOperation extends AssignmentOperation{
 
 }
 
