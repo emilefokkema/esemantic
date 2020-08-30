@@ -31,9 +31,9 @@ var visit = function(node, visitor){
 			var newVisitor = collection.getNewVisitor(childWrapped, visitor, (onDone) => {childVisitDoneHandlers.unshift(onDone);});
 			if(newVisitor){
 				continuation(childWrapped, newVisitor);
-				for(var childVisitDoneHandler of childVisitDoneHandlers){
-					childVisitDoneHandler();
-				}
+			}
+			for(var childVisitDoneHandler of childVisitDoneHandlers){
+				childVisitDoneHandler();
 			}
 		}
 	})(new NodeWrapper(node), visitor);
