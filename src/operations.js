@@ -1,96 +1,93 @@
 export class Operation{
 	constructor(tree){
 		this.tree = tree;
-		this.childOperations = [];
-	}
-	getOperation(tree){
-		for(var childOperation of this.childOperations){
-			var childResult = childOperation.getOperation(tree);
-			if(childResult){
-				return childResult;
-			}
-		}
-		if(tree === this.tree){
-			return this;
-		}
-		return undefined;
 	}
 };
 
 export class ObjectDestructuringAssignmentOperation extends Operation{
 	constructor(tree, propertyAssignments){
 		super(tree);
-		this.childOperations = propertyAssignments;
+		this.properties = propertyAssignments;
+		this.kind = "ObjectDestructuringAssignment";
 	}
 }
 
 export class ArrayDestructuringAssignmentOperation extends Operation{
 	constructor(tree, assignmentOperations){
 		super(tree);
-		this.childOperations = assignmentOperations;
+		this.elements = assignmentOperations;
+		this.kind = "ArrayDestructuringAssignment";
 	}
 }
 
 export class PropertyDestructuringAssignmentOperation extends Operation{
 	constructor(tree, assignmentOperation){
 		super(tree);
-		this.key = tree.key;
-		this.childOperations.push(assignmentOperation);
+		this.valueAssignment = assignmentOperation;
+		this.kind = "PropertyDestructuringAssignment";
 	}
 }
 
 export class DefaultAssignmentOperation extends Operation{
 	constructor(tree, assignmentOperation){
 		super(tree);
-		this.left = tree.left;
-		this.childOperations.push(assignmentOperation);
+		this.assignment = assignmentOperation;
+		this.kind = "DefaultAssignment";
 	}
 }
 
 export class RestElementAssignmentOperation extends Operation{
 	constructor(tree, assignmentOperation){
 		super(tree);
-		this.childOperations.push(assignmentOperation);
+		this.assignment = assignmentOperation;
+		this.kind = "RestElementAssignment";
 	}
 }
 
 export class SymbolAssignmentOperation extends Operation{
-
+	constructor(tree) {
+		super(tree);
+		this.kind = "SymbolAssignment";
+	}
 }
 
 export class ParameterAssignmentOperation extends Operation{
 	constructor(tree, assignmentOperation){
 		super(tree);
-		this.childOperations.push(assignmentOperation);
+		this.assignment = assignmentOperation;
+		this.kind = "ParameterAssignment";
 	}
 }
 
 export class VariableDeclaratorOperation extends Operation{
 	constructor(tree, assignmentOperation){
 		super(tree);
-		this.id = tree.id;
-		this.childOperations.push(assignmentOperation);
+		this.assignment = assignmentOperation;
+		this.kind = "VariableDeclarator";
 	}
 }
 
 export class VariableDeclarationOperation extends Operation{
 	constructor(tree, declaratorOperations){
 		super(tree);
-		this.childOperations = declaratorOperations;
+		this.declarators = declaratorOperations;
+		this.kind = "VariableDeclaration";
 	}
 }
 
 export class FunctionDeclarationOperation extends Operation{
 	constructor(tree, parameterAssignments, blockOperation){
 		super(tree);
-		this.childOperations.push(...parameterAssignments);
-		this.childOperations.push(blockOperation);
+		this.params = parameterAssignments;
+		this.body = blockOperation;
+		this.kind = "FunctionDeclaration";
 	}
 }
 
 export class BlockOperation extends Operation{
 	constructor(tree, operations){
 		super(tree);
-		this.childOperations = operations;
+		this.operations = operations;
+		this.kind = "Block";
 	}
 }

@@ -109,32 +109,45 @@ describe('a program', () => {
 		program = Program.create(tree);
 	});
 
-	describe('that is asked for operations', () => {
-		let variableDeclarationNode, variableDeclaratorNode, functionDeclarationNode, functionBodyNode, parameterNode, variableIdentifierNode;
-		let variableDeclarationOperation, variableDeclaratorOperation, functionDeclarationOperation, functionBodyOperation, parameterDeclarationOperation, variableAssignmentOperation;
-
-		beforeEach(() => {
-			variableDeclarationNode = tree.body[0];
-			variableDeclaratorNode = variableDeclarationNode.declarations[0];
-			variableIdentifierNode = variableDeclaratorNode.id;
-			functionDeclarationNode = tree.body[2];
-			functionBodyNode = functionDeclarationNode.body;
-			parameterNode = functionDeclarationNode.params[0];
-			variableDeclarationOperation = program.getOperation(variableDeclarationNode);
-			variableDeclaratorOperation = program.getOperation(variableDeclaratorNode);
-			functionDeclarationOperation = program.getOperation(functionDeclarationNode);
-			functionBodyOperation = program.getOperation(functionBodyNode);
-			parameterDeclarationOperation = program.getOperation(parameterNode);
-			variableAssignmentOperation = program.getOperation(variableIdentifierNode);
-		});
-
-		it('should return something', () => {
-			expect(variableDeclarationOperation).toBeTruthy();
-			expect(variableDeclaratorOperation).toBeTruthy();
-			expect(functionDeclarationOperation).toBeTruthy();
-			expect(functionBodyOperation).toBeTruthy();
-			expect(parameterDeclarationOperation).toBeTruthy();
-			expect(variableAssignmentOperation).toBeTruthy();
+	it('should result in this tree', () => {
+		expect(program).toEqual({
+			kind: "Program",
+			tree: tree,
+			operations: [
+				{
+					kind: "VariableDeclaration",
+					tree: tree.body[0],
+					declarators: [
+						{
+							kind: "VariableDeclarator",
+							tree: tree.body[0].declarations[0],
+							assignment: {
+								kind: "SymbolAssignment",
+								tree: tree.body[0].declarations[0].id
+							}
+						}
+					]
+				},
+				{
+					kind: "FunctionDeclaration",
+					tree: tree.body[2],
+					params: [
+						{
+							kind: "ParameterAssignment",
+							tree: tree.body[2].params[0],
+							assignment: {
+								kind: "SymbolAssignment",
+								tree: tree.body[2].params[0]
+							}
+						}
+					],
+					body: {
+						kind: "Block",
+						tree: tree.body[2].body,
+						operations: []
+					}
+				}
+			]
 		});
 	});
 });
@@ -188,13 +201,36 @@ describe('a program with a function with a rest element as parameter', () => {
 		program = Program.create(tree);
 	});
 
-	it('should have an operation for the spread element', () => {
-		expect(program.getOperation(tree.body[0].params[0])).toBeTruthy();
-	});
-
-	it('should have an operation for the spread element argument', () => {
-		var spreadElementArgumentOperation = program.getOperation(tree.body[0].params[0].argument);
-		expect(spreadElementArgumentOperation).toBeTruthy();
+	it('should result in this tree', () => {
+		expect(program).toEqual({
+			kind: "Program",
+			tree: tree,
+			operations: [
+				{
+					kind: "FunctionDeclaration",
+					tree: tree.body[0],
+					params: [
+						{
+							kind: "ParameterAssignment",
+							tree: tree.body[0].params[0],
+							assignment: {
+								kind: "RestElementAssignment",
+								tree: tree.body[0].params[0],
+								assignment: {
+									tree: tree.body[0].params[0].argument,
+									kind: "SymbolAssignment"
+								}
+							}
+						}
+					],
+					body: {
+						kind: "Block",
+						tree: tree.body[0].body,
+						operations: []
+					}
+				}
+			]
+		});
 	});
 });
 
@@ -319,13 +355,50 @@ describe('a program with a function with an object pattern as parameter', () => 
 		program = Program.create(tree);
 	});
 
-	it('should have an operation for the object pattern', () => {
-		expect(program.getOperation(tree.body[0].params[0])).toBeTruthy();
-	});
-
-	it(`should have an operation for the object pattern's properties' values`, () => {
-		expect(program.getOperation(tree.body[0].params[0].properties[0].value)).toBeTruthy();
-		expect(program.getOperation(tree.body[0].params[0].properties[1].value)).toBeTruthy();
+	it('should result in this tree', () => {
+		expect(program).toEqual({
+			kind: "Program",
+			tree: tree,
+			operations: [
+				{
+					kind: "FunctionDeclaration",
+					tree: tree.body[0],
+					params: [
+						{
+							kind: "ParameterAssignment",
+							tree: tree.body[0].params[0],
+							assignment: {
+								kind: "ObjectDestructuringAssignment",
+								tree: tree.body[0].params[0],
+								properties: [
+									{
+										kind: "PropertyDestructuringAssignment",
+										tree: tree.body[0].params[0].properties[0],
+										valueAssignment: {
+											kind: "SymbolAssignment",
+											tree: tree.body[0].params[0].properties[0].value
+										}
+									},
+									{
+										kind: "PropertyDestructuringAssignment",
+										tree: tree.body[0].params[0].properties[1],
+										valueAssignment: {
+											kind: "SymbolAssignment",
+											tree: tree.body[0].params[0].properties[1].value
+										}
+									}
+								]
+							}
+						}
+					],
+					body: {
+						kind: "Block",
+						tree: tree.body[0].body,
+						operations: []
+					}
+				}
+			]
+		});
 	});
 });
 
@@ -385,17 +458,43 @@ describe('a program with a function with an array pattern as a parameter', () =>
 		  };
 		program = Program.create(tree);
 	});
-
-	it('should have an operation for the array pattern', () => {
-		var arrayPatternOperation = program.getOperation(tree.body[0].params[0]);
-		expect(arrayPatternOperation).toBeTruthy();
-	});
-
-	it(`should have an operation for each of the array pattern's elements`, () => {
-		var arrayPatternElementOperation1 = program.getOperation(tree.body[0].params[0].elements[0]);
-		var arrayPatternElementOperation2 = program.getOperation(tree.body[0].params[0].elements[1]);
-		expect(arrayPatternElementOperation1).toBeTruthy();
-		expect(arrayPatternElementOperation2).toBeTruthy();
+	
+	it('should result in this tree', () => {
+		expect(program).toEqual({
+			kind: "Program",
+			tree: tree,
+			operations: [
+				{
+					kind: "FunctionDeclaration",
+					tree: tree.body[0],
+					params: [
+						{
+							kind: "ParameterAssignment",
+							tree: tree.body[0].params[0],
+							assignment: {
+								kind: "ArrayDestructuringAssignment",
+								tree: tree.body[0].params[0],
+								elements: [
+									{
+										kind: "SymbolAssignment",
+										tree: tree.body[0].params[0].elements[0]
+									},
+									{
+										kind: "SymbolAssignment",
+										tree: tree.body[0].params[0].elements[1]
+									}
+								]
+							}
+						}
+					],
+					body: {
+						kind: "Block",
+						tree: tree.body[0].body,
+						operations: []
+					}
+				}
+			]
+		})
 	});
 });
 
@@ -455,14 +554,36 @@ describe('a program with a functin with an assignment pattern as a parameter', (
 		program = Program.create(tree);
 	});
 
-	it('should have an operation for the assignment pattern', () => {
-		var assignmentPatternOperation = program.getOperation(tree.body[0].params[0]);
-		expect(assignmentPatternOperation).toBeTruthy();
-	});
-
-	it(`should have an operation for the assignment pattern's left`, () => {
-		var assignmentPatternLeftOperation = program.getOperation(tree.body[0].params[0].left);
-		expect(assignmentPatternLeftOperation).toBeTruthy();
+	it('should result in this tree', () => {
+		expect(program).toEqual({
+			kind: "Program",
+			tree: tree,
+			operations: [
+				{
+					kind: "FunctionDeclaration",
+					tree: tree.body[0],
+					params: [
+						{
+							kind: "ParameterAssignment",
+							tree: tree.body[0].params[0],
+							assignment: {
+								kind: "DefaultAssignment",
+								tree: tree.body[0].params[0],
+								assignment: {
+									kind: "SymbolAssignment",
+									tree: tree.body[0].params[0].left
+								}
+							}
+						}
+					],
+					body: {
+						kind: "Block",
+						tree: tree.body[0].body,
+						operations: []
+					}
+				}
+			]
+		});
 	});
 });
 
@@ -550,27 +671,44 @@ describe('a program containing a variable declarator with an object pattern', ()
 		program = Program.create(tree);
 	});
 
-	it(`should have an operation for the variable declarator`, () => {
-		var declaratorOperation = program.getOperation(tree.body[0].declarations[0]);
-		expect(declaratorOperation).toBeTruthy();
-	});
-
-	it(`should have an operation for the variable declarator's id`, () => {
-		var declaratorIdOperation = program.getOperation(tree.body[0].declarations[0].id);
-		expect(declaratorIdOperation).toBeTruthy();
-	});
-
-	it(`should have an operation for each of the variable declarator's id's properties`, () => {
-		var property1Operation = program.getOperation(tree.body[0].declarations[0].id.properties[0]);
-		var property2Operation = program.getOperation(tree.body[0].declarations[0].id.properties[1]);
-		expect(property1Operation).toBeTruthy();
-		expect(property2Operation).toBeTruthy();
-	});
-
-	it(`should have an operation for each of the variable declarator's id's properties' values`, () => {
-		var property1ValueOperation = program.getOperation(tree.body[0].declarations[0].id.properties[0].value);
-		var property2ValueOperation = program.getOperation(tree.body[0].declarations[0].id.properties[1].value);
-		expect(property1ValueOperation).toBeTruthy();
-		expect(property2ValueOperation).toBeTruthy();
+	it('should result in this tree', () => {
+		expect(program).toEqual({
+			kind: "Program",
+			tree: tree,
+			operations: [
+				{
+					kind: "VariableDeclaration",
+					tree: tree.body[0],
+					declarators: [
+						{
+							kind: "VariableDeclarator",
+							tree: tree.body[0].declarations[0],
+							assignment: {
+								kind: "ObjectDestructuringAssignment",
+								tree: tree.body[0].declarations[0].id,
+								properties: [
+									{
+										kind: "PropertyDestructuringAssignment",
+										tree: tree.body[0].declarations[0].id.properties[0],
+										valueAssignment: {
+											kind: "SymbolAssignment",
+											tree: tree.body[0].declarations[0].id.properties[0].value
+										}
+									},
+									{
+										kind: "PropertyDestructuringAssignment",
+										tree: tree.body[0].declarations[0].id.properties[1],
+										valueAssignment: {
+											kind: "SymbolAssignment",
+											tree: tree.body[0].declarations[0].id.properties[1].value
+										}
+									}
+								]
+							}
+						}
+					]
+				}
+			]
+		});
 	});
 });

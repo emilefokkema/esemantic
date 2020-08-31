@@ -232,6 +232,11 @@ class ProgramTreeVisitor extends BlockVisitor{
 }
 
 export class Program extends BlockOperation{
+	constructor(tree, operations) {
+		super(tree, operations);
+		this.kind = "Program";
+	}
+
 
 	static create(tree){
 		var globalScope = new BlockScope();
