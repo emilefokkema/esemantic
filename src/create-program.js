@@ -11,7 +11,8 @@ import {
 	VariableDeclaratorOperation,
 	VariableDeclarationOperation,
 	FunctionDeclarationOperation,
-	BlockOperation} from './operations'
+	BlockOperation,
+	Program} from './operations'
 
 class Symbol{
 	constructor(identifier, kind) {
@@ -70,17 +71,14 @@ class AssignmentTargetPatternVisitor{
 	constructor(createSymbolAssignmentOperation){
 		this.createSymbolAssignmentOperation = createSymbolAssignmentOperation;
 		this.operation = undefined;
-		this.symbolAssignments = [];
 	}
 	Identifier(node){
 		this.operation = this.createSymbolAssignmentOperation(node);
-		this.symbolAssignments = [this.operation];
 	}
 	RestElement(node, _, onDone){
 		var visitor = new AssignmentTargetPatternVisitor(this.createSymbolAssignmentOperation);
 		onDone(() => {
 			this.operation = new RestElementAssignmentOperation(node, visitor.operation);
-			this.symbolAssignments = visitor.symbolAssignments;
 		});
 		return visitor;
 	}
@@ -88,7 +86,6 @@ class AssignmentTargetPatternVisitor{
 		var visitor = new ObjectPatternVisitor(this.createSymbolAssignmentOperation);
 		onDone(() => {
 			this.operation = new ObjectDestructuringAssignmentOperation(node, visitor.propertyAssignments);
-			this.symbolAssignments = visitor.symbolAssignments;
 		});
 		return visitor;
 	}
@@ -96,7 +93,6 @@ class AssignmentTargetPatternVisitor{
 		var visitor = new ArrayPatternVisitor(this.createSymbolAssignmentOperation);
 		onDone(() => {
 			this.operation = new ArrayDestructuringAssignmentOperation(node, visitor.assignmentOperations);
-			this.symbolAssignments = visitor.symbolAssignments;
 		});
 		return visitor;
 	}
@@ -104,7 +100,6 @@ class AssignmentTargetPatternVisitor{
 		var visitor = new AssignmentPatternVisitor(node.left, this.createSymbolAssignmentOperation);
 		onDone(() => {
 			this.operation = new DefaultAssignmentOperation(node, visitor.assignmentOperation);
-			this.symbolAssignments = visitor.symbolAssignments;
 		});
 		return visitor;
 	}
@@ -114,7 +109,6 @@ class AssignmentPatternVisitor{
 	constructor(left, createSymbolAssignmentOperation){
 		this.createSymbolAssignmentOperation = createSymbolAssignmentOperation;
 		this.left = left;
-		this.symbolAssignments = [];
 		this.assignmentOperation = undefined;
 	}
 	Expression(node, useVisitor, onDone){
@@ -122,7 +116,6 @@ class AssignmentPatternVisitor{
 			var visitor = new AssignmentTargetPatternVisitor(this.createSymbolAssignmentOperation);
 			onDone(() => {
 				this.assignmentOperation = visitor.operation;
-				this.symbolAssignments = visitor.symbolAssignments;
 			});
 			return useVisitor(visitor);
 		}
@@ -134,7 +127,6 @@ class PropertyAssignmentVisitor{
 		this.createSymbolAssignmentOperation = createSymbolAssignmentOperation;
 		this.key = key;
 		this.operation = undefined;
-		this.symbolAssignments = [];
 	}
 	Pattern(node, useVisitor, onDone){
 		if(node === this.key){
@@ -142,7 +134,6 @@ class PropertyAssignmentVisitor{
 		}
 		var visitor = new AssignmentTargetPatternVisitor(this.createSymbolAssignmentOperation);
 		onDone(() => {
-			this.symbolAssignments = visitor.symbolAssignments;
 			this.operation = visitor.operation;
 		});
 		return useVisitor(visitor);
@@ -152,13 +143,11 @@ class PropertyAssignmentVisitor{
 class ObjectPatternVisitor{
 	constructor(createSymbolAssignmentOperation){
 		this.createSymbolAssignmentOperation = createSymbolAssignmentOperation;
-		this.symbolAssignments = [];
 		this.propertyAssignments = [];
 	}
 	Property(node, _, onDone){
 		var visitor = new PropertyAssignmentVisitor(node.key, this.createSymbolAssignmentOperation);
 		onDone(() => {
-			this.symbolAssignments.push(...visitor.symbolAssignments);
 			this.propertyAssignments.push(new PropertyDestructuringAssignmentOperation(node, visitor.operation));
 		});
 		return visitor;
@@ -169,12 +158,10 @@ class ArrayPatternVisitor{
 	constructor(createSymbolAssignmentOperation){
 		this.createSymbolAssignmentOperation = createSymbolAssignmentOperation;
 		this.assignmentOperations = [];
-		this.symbolAssignments = [];
 	}
 	Pattern(node, useVisitor, onDone){
 		var visitor = new AssignmentTargetPatternVisitor(this.createSymbolAssignmentOperation);
 		onDone(() => {
-			this.symbolAssignments.push(...visitor.symbolAssignments);
 			this.assignmentOperations.push(visitor.operation);
 		});
 		return useVisitor(visitor);
@@ -248,18 +235,10 @@ class ProgramTreeVisitor extends BlockVisitor{
 	}
 }
 
-export class Program extends BlockOperation{
-	constructor(tree, operations) {
-		super(tree, operations);
-		this.kind = "Program";
-	}
-
-
-	static create(tree){
-		var globalScope = new BlockScope();
-		var visitor = new ProgramTreeVisitor(globalScope);
-		visit(tree, visitor);
-		var program = new Program(tree, visitor.operations);
-		return program;
-	}
+export function createProgram(tree){
+	var globalScope = new BlockScope();
+	var visitor = new ProgramTreeVisitor(globalScope);
+	visit(tree, visitor);
+	var program = new Program(tree, visitor.operations);
+	return program;
 }

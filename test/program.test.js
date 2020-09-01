@@ -1,4 +1,4 @@
-import { Program } from '../src/program';
+import { createProgram } from '../src/create-program';
 
 describe('a program', () => {
 	let program, tree;
@@ -106,7 +106,7 @@ describe('a program', () => {
 		  ],
 		  "sourceType": "script"
 		};
-		program = Program.create(tree);
+		program = createProgram(tree);
 	});
 
 	it('should result in this tree', () => {
@@ -229,7 +229,7 @@ describe('a program with a function with a rest element as parameter', () => {
 		  ],
 		  "sourceType": "script"
 		};
-		program = Program.create(tree);
+		program = createProgram(tree);
 	});
 
 	it('should result in this tree', () => {
@@ -405,7 +405,7 @@ describe('a program with a function with an object pattern as parameter', () => 
 			],
 			"sourceType": "script"
 		  }
-		program = Program.create(tree);
+		program = createProgram(tree);
 	});
 
 	it('should result in this tree', () => {
@@ -540,7 +540,7 @@ describe('a program with a function with an array pattern as a parameter', () =>
 			],
 			"sourceType": "script"
 		  };
-		program = Program.create(tree);
+		program = createProgram(tree);
 	});
 	
 	it('should result in this tree', () => {
@@ -666,7 +666,7 @@ describe('a program with a functin with an assignment pattern as a parameter', (
 			],
 			"sourceType": "script"
 		  };
-		program = Program.create(tree);
+		program = createProgram(tree);
 	});
 
 	it('should result in this tree', () => {
@@ -805,7 +805,7 @@ describe('a program containing a variable declarator with an object pattern', ()
 			],
 			"sourceType": "script"
 		  };
-		program = Program.create(tree);
+		program = createProgram(tree);
 	});
 
 	it('should result in this tree', () => {

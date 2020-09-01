@@ -101,3 +101,10 @@ export class BlockOperation extends Operation{
 		this.kind = "Block";
 	}
 }
+
+export class Program extends BlockOperation{
+	constructor(tree, operations) {
+		super(tree, operations);
+		this.kind = "Program";
+	}
+}
