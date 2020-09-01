@@ -123,7 +123,16 @@ describe('a program', () => {
 							tree: tree.body[0].declarations[0],
 							assignment: {
 								kind: "SymbolAssignment",
-								tree: tree.body[0].declarations[0].id
+								tree: tree.body[0].declarations[0].id,
+								reference: {
+									kind: "SymbolReference",
+									tree: tree.body[0].declarations[0].id,
+									symbol: {
+										name: "a",
+										declaration: tree.body[0].declarations[0].id,
+										kind: "var"
+									}
+								}
 							}
 						}
 					]
@@ -131,13 +140,35 @@ describe('a program', () => {
 				{
 					kind: "FunctionDeclaration",
 					tree: tree.body[2],
+					assignment: {
+						kind: "SymbolAssignment",
+						tree: tree.body[2].id,
+						reference: {
+							kind: "SymbolReference",
+							tree: tree.body[2].id,
+							symbol: {
+								name: "c",
+								declaration: tree.body[2].id,
+								kind: "var"
+							}
+						}
+					},
 					params: [
 						{
 							kind: "ParameterAssignment",
 							tree: tree.body[2].params[0],
 							assignment: {
 								kind: "SymbolAssignment",
-								tree: tree.body[2].params[0]
+								tree: tree.body[2].params[0],
+								reference: {
+									kind: "SymbolReference",
+									tree:  tree.body[2].params[0],
+									symbol: {
+										declaration: tree.body[2].params[0],
+										name: "d",
+										kind: "var"
+									}
+								}
 							}
 						}
 					],
@@ -209,6 +240,19 @@ describe('a program with a function with a rest element as parameter', () => {
 				{
 					kind: "FunctionDeclaration",
 					tree: tree.body[0],
+					assignment: {
+						kind: "SymbolAssignment",
+						tree: tree.body[0].id,
+						reference: {
+							kind: "SymbolReference",
+							tree: tree.body[0].id,
+							symbol: {
+								name: "a",
+								declaration: tree.body[0].id,
+								kind: "var"
+							}
+						}
+					},
 					params: [
 						{
 							kind: "ParameterAssignment",
@@ -218,7 +262,16 @@ describe('a program with a function with a rest element as parameter', () => {
 								tree: tree.body[0].params[0],
 								assignment: {
 									tree: tree.body[0].params[0].argument,
-									kind: "SymbolAssignment"
+									kind: "SymbolAssignment",
+									reference: {
+										kind: "SymbolReference",
+										tree: tree.body[0].params[0].argument,
+										symbol: {
+											name: "b",
+											kind: "var",
+											declaration: tree.body[0].params[0].argument
+										}
+									}
 								}
 							}
 						}
@@ -363,6 +416,19 @@ describe('a program with a function with an object pattern as parameter', () => 
 				{
 					kind: "FunctionDeclaration",
 					tree: tree.body[0],
+					assignment: {
+						kind: "SymbolAssignment",
+						tree: tree.body[0].id,
+						reference: {
+							kind: "SymbolReference",
+							tree: tree.body[0].id,
+							symbol: {
+								name: "a",
+								declaration: tree.body[0].id,
+								kind: "var"
+							}
+						}
+					},
 					params: [
 						{
 							kind: "ParameterAssignment",
@@ -376,7 +442,16 @@ describe('a program with a function with an object pattern as parameter', () => 
 										tree: tree.body[0].params[0].properties[0],
 										valueAssignment: {
 											kind: "SymbolAssignment",
-											tree: tree.body[0].params[0].properties[0].value
+											tree: tree.body[0].params[0].properties[0].value,
+											reference: {
+												kind: "SymbolReference",
+												tree: tree.body[0].params[0].properties[0].value,
+												symbol: {
+													name: "c",
+													kind: "var",
+													declaration: tree.body[0].params[0].properties[0].value
+												}
+											}
 										}
 									},
 									{
@@ -384,7 +459,16 @@ describe('a program with a function with an object pattern as parameter', () => 
 										tree: tree.body[0].params[0].properties[1],
 										valueAssignment: {
 											kind: "SymbolAssignment",
-											tree: tree.body[0].params[0].properties[1].value
+											tree: tree.body[0].params[0].properties[1].value,
+											reference: {
+												kind: "SymbolReference",
+												tree: tree.body[0].params[0].properties[1].value,
+												symbol: {
+													name: "d",
+													declaration: tree.body[0].params[0].properties[1].value,
+													kind: "var"
+												}
+											}
 										}
 									}
 								]
@@ -467,6 +551,19 @@ describe('a program with a function with an array pattern as a parameter', () =>
 				{
 					kind: "FunctionDeclaration",
 					tree: tree.body[0],
+					assignment: {
+						kind: "SymbolAssignment",
+						tree: tree.body[0].id,
+						reference: {
+							kind: "SymbolReference",
+							tree: tree.body[0].id,
+							symbol:{
+								name: "a",
+								declaration: tree.body[0].id,
+								kind: "var"
+							}
+						}
+					},
 					params: [
 						{
 							kind: "ParameterAssignment",
@@ -477,11 +574,29 @@ describe('a program with a function with an array pattern as a parameter', () =>
 								elements: [
 									{
 										kind: "SymbolAssignment",
-										tree: tree.body[0].params[0].elements[0]
+										tree: tree.body[0].params[0].elements[0],
+										reference: {
+											kind: "SymbolReference",
+											tree: tree.body[0].params[0].elements[0],
+											symbol: {
+												name: "b",
+												declaration: tree.body[0].params[0].elements[0],
+												kind: "var"
+											}
+										}
 									},
 									{
 										kind: "SymbolAssignment",
-										tree: tree.body[0].params[0].elements[1]
+										tree: tree.body[0].params[0].elements[1],
+										reference: {
+											kind: "SymbolReference",
+											tree: tree.body[0].params[0].elements[1],
+											symbol: {
+												name: "c",
+												declaration: tree.body[0].params[0].elements[1],
+												kind: "var"
+											}
+										}
 									}
 								]
 							}
@@ -562,6 +677,19 @@ describe('a program with a functin with an assignment pattern as a parameter', (
 				{
 					kind: "FunctionDeclaration",
 					tree: tree.body[0],
+					assignment: {
+						kind: "SymbolAssignment",
+						tree: tree.body[0].id,
+						reference: {
+							kind: "SymbolReference",
+							tree: tree.body[0].id,
+							symbol: {
+								name: "a",
+								declaration: tree.body[0].id,
+								kind: "var"
+							}
+						}
+					},
 					params: [
 						{
 							kind: "ParameterAssignment",
@@ -571,7 +699,16 @@ describe('a program with a functin with an assignment pattern as a parameter', (
 								tree: tree.body[0].params[0],
 								assignment: {
 									kind: "SymbolAssignment",
-									tree: tree.body[0].params[0].left
+									tree: tree.body[0].params[0].left,
+									reference: {
+										kind: "SymbolReference",
+										tree: tree.body[0].params[0].left,
+										symbol: {
+											name: "b",
+											declaration: tree.body[0].params[0].left,
+											kind: "var"
+										}
+									}
 								}
 							}
 						}
@@ -692,7 +829,16 @@ describe('a program containing a variable declarator with an object pattern', ()
 										tree: tree.body[0].declarations[0].id.properties[0],
 										valueAssignment: {
 											kind: "SymbolAssignment",
-											tree: tree.body[0].declarations[0].id.properties[0].value
+											tree: tree.body[0].declarations[0].id.properties[0].value,
+											reference: {
+												kind: "SymbolReference",
+												tree: tree.body[0].declarations[0].id.properties[0].value,
+												symbol: {
+													name: "b",
+													declaration: tree.body[0].declarations[0].id.properties[0].value,
+													kind: "var"
+												}
+											}
 										}
 									},
 									{
@@ -700,7 +846,16 @@ describe('a program containing a variable declarator with an object pattern', ()
 										tree: tree.body[0].declarations[0].id.properties[1],
 										valueAssignment: {
 											kind: "SymbolAssignment",
-											tree: tree.body[0].declarations[0].id.properties[1].value
+											tree: tree.body[0].declarations[0].id.properties[1].value,
+											reference: {
+												kind: "SymbolReference",
+												tree: tree.body[0].declarations[0].id.properties[1].value,
+												symbol: {
+													name: "c",
+													declaration: tree.body[0].declarations[0].id.properties[1].value,
+													kind: "var"
+												}
+											}
 										}
 									}
 								]

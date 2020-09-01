@@ -44,9 +44,18 @@ export class RestElementAssignmentOperation extends Operation{
 	}
 }
 
-export class SymbolAssignmentOperation extends Operation{
-	constructor(tree) {
+export class SymbolReferenceOperation extends Operation{
+	constructor(tree, symbol) {
 		super(tree);
+		this.symbol = symbol;
+		this.kind = "SymbolReference";
+	}
+}
+
+export class SymbolAssignmentOperation extends Operation{
+	constructor(tree, symbolReference) {
+		super(tree);
+		this.reference = symbolReference;
 		this.kind = "SymbolAssignment";
 	}
 }
@@ -76,8 +85,9 @@ export class VariableDeclarationOperation extends Operation{
 }
 
 export class FunctionDeclarationOperation extends Operation{
-	constructor(tree, parameterAssignments, blockOperation){
+	constructor(tree, assignment, parameterAssignments, blockOperation){
 		super(tree);
+		this.assignment = assignment;
 		this.params = parameterAssignments;
 		this.body = blockOperation;
 		this.kind = "FunctionDeclaration";
