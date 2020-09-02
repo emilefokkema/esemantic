@@ -25,14 +25,26 @@ class Symbol{
 var scopeId = 0;
 class BlockScope{
 	constructor(){
+		this.symbols = [];
 		this.scopeId = scopeId++;
 	}
-	addSymbol(id, kind){
+
+	createSymbol(id, kind){
 		return new Symbol(id, kind);
 		//console.log(`scope with id ${this.scopeId} creating symbol for `, id);
 	}
 	createFunctionScope(){
 		return new BlockScope();
+	}
+}
+
+class AssigningSymbolReferencer{
+	constructor(scope, kind){
+		this.scope = scope;
+		this.kind = kind;
+	}
+	referToSymbolByIdentifier(id){
+
 	}
 }
 
@@ -212,12 +224,12 @@ class FunctionDeclarationVisitor{
 
 	Pattern(node, useVisitor){
 		if(node === this.tree.id){
-			var symbol = this.scope.addSymbol(node, 'var');
+			var symbol = this.scope.createSymbol(node, 'var');
 			var symbolReference = new SymbolReferenceOperation(node, symbol);
 			this.assignment = new SymbolAssignmentOperation(node, symbolReference);
 		}else{
 			var visitor = new AssignmentTargetPatternVisitor((id) => {
-				var symbol = this.functionScope.addSymbol(id, 'var');
+				var symbol = this.functionScope.createSymbol(id, 'var');
 				var symbolReference = new SymbolReferenceOperation(id, symbol);
 				return new SymbolAssignmentOperation(id, symbolReference)
 			});
@@ -240,7 +252,7 @@ class BlockVisitor{
 
 	VariableDeclaration(node){
 		var visitor = new VariableDeclarationVisitor((id) => {
-			var symbol = this.scope.addSymbol(id, node.kind);//new Symbol(id, node.kind);
+			var symbol = this.scope.createSymbol(id, node.kind);//new Symbol(id, node.kind);
 			var symbolReference = new SymbolReferenceOperation(id, symbol);
 			return new SymbolAssignmentOperation(id, symbolReference)
 		}, node);
