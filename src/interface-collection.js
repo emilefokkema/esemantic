@@ -97,15 +97,15 @@ export class InterfaceCollection{
 		}
 		return visitor[mostSpecific[0].name];
 	}
-	getNewVisitor(node, visitor, registerNewVisitorDone){
+	getNewVisitor(node, visitor){
 		var nodeTypes = this.getNodeType(node).getSelfAndParents();
-		return this.getNewVisitorFromNodeAndTypesAndVisitor(node, nodeTypes, visitor, registerNewVisitorDone);
+		return this.getNewVisitorFromNodeAndTypesAndVisitor(node, nodeTypes, visitor);
 	}
-	getNewVisitorFromNodeAndTypesAndVisitor(node, nodeTypes, visitor, registerNewVisitorDone){
+	getNewVisitorFromNodeAndTypesAndVisitor(node, nodeTypes, visitor){
 		var visitorMethod = this.findVisitorMethod(node.type, nodeTypes, visitor);
 		if(!visitorMethod){
 			return visitor;
 		}
-		return visitorMethod.apply(visitor, [node.node, (replacingVisitor) => this.getNewVisitorFromNodeAndTypesAndVisitor(node, nodeTypes, replacingVisitor, registerNewVisitorDone), registerNewVisitorDone]);
+		return visitorMethod.apply(visitor, [node.node, (replacingVisitor) => this.getNewVisitorFromNodeAndTypesAndVisitor(node, nodeTypes, replacingVisitor)]);
 	}
 }

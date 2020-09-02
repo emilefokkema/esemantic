@@ -27,13 +27,9 @@ var visit = function(node, visitor){
 		var children = collection.getChildren(node);
 		for(var child of children){
 			var childWrapped = new NodeWrapper(child, node);
-			var childVisitDoneHandlers = [];
-			var newVisitor = collection.getNewVisitor(childWrapped, visitor, (onDone) => {childVisitDoneHandlers.unshift(onDone);});
+			var newVisitor = collection.getNewVisitor(childWrapped, visitor);
 			if(newVisitor){
 				continuation(childWrapped, newVisitor);
-			}
-			for(var childVisitDoneHandler of childVisitDoneHandlers){
-				childVisitDoneHandler();
 			}
 		}
 	})(new NodeWrapper(node), visitor);

@@ -37,31 +37,36 @@ class BlockScope{
 }
 
 class VariableDeclarationVisitor{
-	constructor(createSymbolAssignmentOperation){
+	constructor(createSymbolAssignmentOperation, tree){
+		this.tree = tree;
 		this.createSymbolAssignmentOperation = createSymbolAssignmentOperation;
-		this.declaratorOperations = [];
+		this.declaratorVisitors = [];
 	}
-	VariableDeclarator(node, _, onDone){
-		var visitor = new VariableDeclaratorVisitor(node.id, this.createSymbolAssignmentOperation);
-		onDone(() => {
-			this.declaratorOperations.push(new VariableDeclaratorOperation(node, visitor.assignmentOperation));
-		});
+	getOperation(){
+		return new VariableDeclarationOperation(this.tree, this.declaratorVisitors.map(v => v.getOperation()));
+	}
+	VariableDeclarator(node){
+		var visitor = new VariableDeclaratorVisitor(this.createSymbolAssignmentOperation, node);
+		this.declaratorVisitors.push(visitor);
 		return visitor;
 	}
 }
 
 class VariableDeclaratorVisitor{
-	constructor(id, createSymbolAssignmentOperation){
+	constructor(createSymbolAssignmentOperation, tree){
+		this.tree = tree;
 		this.createSymbolAssignmentOperation = createSymbolAssignmentOperation;
-		this.id = id;
-		this.assignmentOperation = undefined;
+		this.idVisitor = undefined;
 	}
-	Pattern(node, useVisitor, onDone){
-		if(node === this.id){
+
+	getOperation(){
+		return new VariableDeclaratorOperation(this.tree, this.idVisitor.getOperation());
+	}
+
+	Pattern(node, useVisitor){
+		if(node === this.tree.id){
 			var visitor = new AssignmentTargetPatternVisitor(this.createSymbolAssignmentOperation);
-			onDone(() => {
-				this.assignmentOperation = visitor.operation;
-			});
+			this.idVisitor = visitor;
 			return useVisitor(visitor);
 		}
 	}
@@ -70,166 +75,192 @@ class VariableDeclaratorVisitor{
 class AssignmentTargetPatternVisitor{
 	constructor(createSymbolAssignmentOperation){
 		this.createSymbolAssignmentOperation = createSymbolAssignmentOperation;
-		this.operation = undefined;
+		this.operationFn = undefined;
+	}
+	getOperation(){
+		return this.operationFn();
 	}
 	Identifier(node){
-		this.operation = this.createSymbolAssignmentOperation(node);
+		this.operationFn = () => this.createSymbolAssignmentOperation(node);
 	}
-	RestElement(node, _, onDone){
+	RestElement(node){
 		var visitor = new AssignmentTargetPatternVisitor(this.createSymbolAssignmentOperation);
-		onDone(() => {
-			this.operation = new RestElementAssignmentOperation(node, visitor.operation);
-		});
+		this.operationFn = () => {
+			return new RestElementAssignmentOperation(node, visitor.getOperation());
+		};
 		return visitor;
 	}
-	ObjectPattern(node, _, onDone){
-		var visitor = new ObjectPatternVisitor(this.createSymbolAssignmentOperation);
-		onDone(() => {
-			this.operation = new ObjectDestructuringAssignmentOperation(node, visitor.propertyAssignments);
-		});
+	ObjectPattern(node){
+		var visitor = new ObjectPatternVisitor(this.createSymbolAssignmentOperation, node);
+		this.operationFn = () => {
+			return visitor.getOperation();
+		};
 		return visitor;
 	}
-	ArrayPattern(node, _, onDone){
-		var visitor = new ArrayPatternVisitor(this.createSymbolAssignmentOperation);
-		onDone(() => {
-			this.operation = new ArrayDestructuringAssignmentOperation(node, visitor.assignmentOperations);
-		});
+	ArrayPattern(node){
+		var visitor = new ArrayPatternVisitor(this.createSymbolAssignmentOperation, node);
+		this.operationFn = () => {
+			return visitor.getOperation();
+		};
 		return visitor;
 	}
-	AssignmentPattern(node, _, onDone){
-		var visitor = new AssignmentPatternVisitor(node.left, this.createSymbolAssignmentOperation);
-		onDone(() => {
-			this.operation = new DefaultAssignmentOperation(node, visitor.assignmentOperation);
-		});
+	AssignmentPattern(node){
+		var visitor = new AssignmentPatternVisitor(this.createSymbolAssignmentOperation, node);
+		this.operationFn = () => {
+			return visitor.getOperation();
+		};
 		return visitor;
 	}
 }
 
 class AssignmentPatternVisitor{
-	constructor(left, createSymbolAssignmentOperation){
+	constructor(createSymbolAssignmentOperation, tree){
 		this.createSymbolAssignmentOperation = createSymbolAssignmentOperation;
-		this.left = left;
-		this.assignmentOperation = undefined;
+		this.tree = tree;
+		this.leftVisitor = undefined;
 	}
-	Expression(node, useVisitor, onDone){
-		if(node === this.left){
+
+	getOperation(){
+		return new DefaultAssignmentOperation(this.tree, this.leftVisitor.getOperation());
+	}
+
+	Expression(node, useVisitor){
+		if(node === this.tree.left){
 			var visitor = new AssignmentTargetPatternVisitor(this.createSymbolAssignmentOperation);
-			onDone(() => {
-				this.assignmentOperation = visitor.operation;
-			});
+			this.leftVisitor = visitor;
 			return useVisitor(visitor);
 		}
 	}
 }
 
 class PropertyAssignmentVisitor{
-	constructor(key, createSymbolAssignmentOperation){
+	constructor(createSymbolAssignmentOperation, tree){
 		this.createSymbolAssignmentOperation = createSymbolAssignmentOperation;
-		this.key = key;
-		this.operation = undefined;
+		this.tree = tree;
+		this.valueVisitor = undefined;
 	}
-	Pattern(node, useVisitor, onDone){
-		if(node === this.key){
+
+	getOperation(){
+		return new PropertyDestructuringAssignmentOperation(this.tree, this.valueVisitor.getOperation())
+	}
+
+	Pattern(node, useVisitor){
+		if(node === this.tree.key){
 			return;
 		}
 		var visitor = new AssignmentTargetPatternVisitor(this.createSymbolAssignmentOperation);
-		onDone(() => {
-			this.operation = visitor.operation;
-		});
+		this.valueVisitor = visitor;
 		return useVisitor(visitor);
 	}
 }
 
 class ObjectPatternVisitor{
-	constructor(createSymbolAssignmentOperation){
+	constructor(createSymbolAssignmentOperation, tree){
+		this.tree = tree;
 		this.createSymbolAssignmentOperation = createSymbolAssignmentOperation;
-		this.propertyAssignments = [];
+		this.propertyVisitors = [];
 	}
-	Property(node, _, onDone){
-		var visitor = new PropertyAssignmentVisitor(node.key, this.createSymbolAssignmentOperation);
-		onDone(() => {
-			this.propertyAssignments.push(new PropertyDestructuringAssignmentOperation(node, visitor.operation));
-		});
+
+	getOperation(){
+		return new ObjectDestructuringAssignmentOperation(this.tree, this.propertyVisitors.map(v => v.getOperation()))
+	}
+
+	Property(node){
+		var visitor = new PropertyAssignmentVisitor(this.createSymbolAssignmentOperation, node);
+		this.propertyVisitors.push(visitor);
 		return visitor;
 	}
 }
 
 class ArrayPatternVisitor{
-	constructor(createSymbolAssignmentOperation){
+	constructor(createSymbolAssignmentOperation, tree){
+		this.tree = tree;
 		this.createSymbolAssignmentOperation = createSymbolAssignmentOperation;
-		this.assignmentOperations = [];
+		this.assignmentVisitors = [];
 	}
-	Pattern(node, useVisitor, onDone){
+
+	getOperation(){
+		return new ArrayDestructuringAssignmentOperation(this.tree, this.assignmentVisitors.map(v => v.getOperation()));
+	}
+
+	Pattern(node, useVisitor){
 		var visitor = new AssignmentTargetPatternVisitor(this.createSymbolAssignmentOperation);
-		onDone(() => {
-			this.assignmentOperations.push(visitor.operation);
-		});
+		this.assignmentVisitors.push(visitor);
 		return useVisitor(visitor);
 	}
 }
 
 class FunctionDeclarationVisitor{
-	constructor(functionScope, id){
-		this.id = id;
-		this.functionScope = functionScope;
-		this.parameterAssignments = [];
-		this.blockOperation = undefined;
+	constructor(tree, scope){
+		this.tree = tree;
+		this.scope = scope;
+		this.functionScope = scope.createFunctionScope();
+		this.parameterFns = [];
+		this.blockVisitor = undefined;
+		this.assignment = undefined;
 	}
 
-	FunctionBody(node, _, onDone){
-		var visitor = new BlockVisitor(this.functionScope);
-		onDone(() => {
-			this.blockOperation = new BlockOperation(node, visitor.operations);
-		});
+	getOperation(){
+		return new FunctionDeclarationOperation(this.tree, this.assignment, this.parameterFns.map(fn => fn()), this.blockVisitor.getOperation());
+	}
+
+	FunctionBody(node){
+		var visitor = new BlockVisitor(this.functionScope, node);
+		this.blockVisitor = visitor;
 		return visitor;
 	}
 
-	Pattern(node, useVisitor, onDone){
-		if(node === this.id){
-			return;
+	Pattern(node, useVisitor){
+		if(node === this.tree.id){
+			var symbol = this.scope.addSymbol(node, 'var');
+			var symbolReference = new SymbolReferenceOperation(node, symbol);
+			this.assignment = new SymbolAssignmentOperation(node, symbolReference);
+		}else{
+			var visitor = new AssignmentTargetPatternVisitor((id) => {
+				var symbol = this.functionScope.addSymbol(id, 'var');
+				var symbolReference = new SymbolReferenceOperation(id, symbol);
+				return new SymbolAssignmentOperation(id, symbolReference)
+			});
+			this.parameterFns.push(() => new ParameterAssignmentOperation(node, visitor.getOperation()));
+			return useVisitor(visitor);
 		}
-		var visitor = new AssignmentTargetPatternVisitor((id) => {
-			var symbol = this.functionScope.addSymbol(id, 'var');
-			var symbolReference = new SymbolReferenceOperation(id, symbol);
-			return new SymbolAssignmentOperation(id, symbolReference)
-		});
-		onDone(() => {
-			this.parameterAssignments.push(new ParameterAssignmentOperation(node, visitor.operation));
-		});
-		return useVisitor(visitor);
 	}
 }
 
 class BlockVisitor{
-	constructor(scope){
+	constructor(scope, tree){
+		this.tree = tree;
 		this.scope = scope;
-		this.operations = [];
+		this.visitors = [];
 	}
 
-	VariableDeclaration(node, _, onDone){
+	getOperation(){
+		return new BlockOperation(this.tree, this.visitors.map(v => v.getOperation()));
+	}
+
+	VariableDeclaration(node){
 		var visitor = new VariableDeclarationVisitor((id) => {
 			var symbol = this.scope.addSymbol(id, node.kind);//new Symbol(id, node.kind);
 			var symbolReference = new SymbolReferenceOperation(id, symbol);
 			return new SymbolAssignmentOperation(id, symbolReference)
-		});
-		onDone(() => {
-			this.operations.push(new VariableDeclarationOperation(node, visitor.declaratorOperations));
-		});
+		}, node);
+		this.visitors.push(visitor);
 		return visitor;
 	}
-	FunctionDeclaration(node, _, onDone){
-		var visitor = new FunctionDeclarationVisitor(this.scope.createFunctionScope(), node.id);
-		var symbol = this.scope.addSymbol(node.id, 'var');
-		var symbolReference = new SymbolReferenceOperation(node.id, symbol);
-		var assignment = new SymbolAssignmentOperation(node.id, symbolReference);
-		onDone(() => {
-			this.operations.push(new FunctionDeclarationOperation(node, assignment, visitor.parameterAssignments, visitor.blockOperation));
-		});
+	FunctionDeclaration(node){
+		var visitor = new FunctionDeclarationVisitor(node, this.scope);
+		this.visitors.push(visitor);
 		return visitor;
 	}
 }
 
 class ProgramTreeVisitor extends BlockVisitor{
+
+	getOperation(){
+		return new Program(this.tree, this.visitors.map(v => v.getOperation()));
+	}
+
+
 	ModuleDeclaration(node){
 
 	}
@@ -237,8 +268,8 @@ class ProgramTreeVisitor extends BlockVisitor{
 
 export function createProgram(tree){
 	var globalScope = new BlockScope();
-	var visitor = new ProgramTreeVisitor(globalScope);
+	var visitor = new ProgramTreeVisitor(globalScope, tree);
 	visit(tree, visitor);
-	var program = new Program(tree, visitor.operations);
+	var program = visitor.getOperation();//new Program(tree, visitor.operations);
 	return program;
 }
