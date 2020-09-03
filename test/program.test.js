@@ -138,6 +138,15 @@ describe('a program', () => {
 					]
 				},
 				{
+					kind: "Expression",
+					tree: tree.body[1],
+					operation: {
+						kind: "SymbolReference",
+						tree: tree.body[1].expression,
+						symbol: undefined
+					}
+				},
+				{
 					kind: "FunctionDeclaration",
 					tree: tree.body[2],
 					assignment: {
@@ -175,7 +184,47 @@ describe('a program', () => {
 					body: {
 						kind: "Block",
 						tree: tree.body[2].body,
-						operations: []
+						operations: [
+							{
+								kind: "Expression",
+								tree: tree.body[2].body.body[0],
+								operation: {
+									kind: "SymbolReference",
+									tree: tree.body[2].body.body[0].expression,
+									symbol: {
+										name: "a",
+										declaration: tree.body[0].declarations[0].id,
+										kind: "var"
+									}
+								}
+							},
+							{
+								kind: "Expression",
+								tree: tree.body[2].body.body[1],
+								operation: {
+									kind: "SymbolReference",
+									tree: tree.body[2].body.body[1].expression,
+									symbol: {
+										declaration: tree.body[2].params[0],
+										name: "d",
+										kind: "var"
+									}
+								}
+							},
+							{
+								kind: "Expression",
+								tree: tree.body[2].body.body[2],
+								operation: {
+									kind: "SymbolReference",
+									tree: tree.body[2].body.body[2].expression,
+									symbol: {
+										name: "c",
+										declaration: tree.body[2].id,
+										kind: "var"
+									}
+								}
+							}
+						]
 					}
 				}
 			]
@@ -478,7 +527,43 @@ describe('a program with a function with an object pattern as parameter', () => 
 					body: {
 						kind: "Block",
 						tree: tree.body[0].body,
-						operations: []
+						operations: [
+							{
+								kind: "Expression",
+								tree: tree.body[0].body.body[0],
+								operation: {
+									kind: "SymbolReference",
+									tree: tree.body[0].body.body[0].expression,
+									symbol: undefined
+								}
+							},
+							{
+								kind: "Expression",
+								tree: tree.body[0].body.body[1],
+								operation: {
+									kind: "SymbolReference",
+									tree: tree.body[0].body.body[1].expression,
+									symbol: {
+										name: "c",
+										kind: "var",
+										declaration: tree.body[0].params[0].properties[0].value
+									}
+								}
+							},
+							{
+								kind: "Expression",
+								tree: tree.body[0].body.body[2],
+								operation: {
+									kind: "SymbolReference",
+									tree: tree.body[0].body.body[2].expression,
+									symbol: {
+										name: "d",
+										declaration: tree.body[0].params[0].properties[1].value,
+										kind: "var"
+									}
+								}
+							}
+						]
 					}
 				}
 			]

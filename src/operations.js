@@ -60,6 +60,14 @@ export class SymbolAssignmentOperation extends Operation{
 	}
 }
 
+export class ExpressionOperation extends Operation{
+	constructor(tree, operation) {
+		super(tree);
+		this.operation = operation;
+		this.kind = "Expression";
+	}
+}
+
 export class ParameterAssignmentOperation extends Operation{
 	constructor(tree, assignmentOperation){
 		super(tree);
