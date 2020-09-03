@@ -5,7 +5,7 @@ import {
 	PropertyDestructuringAssignmentOperation,
 	DefaultAssignmentOperation,
 	RestElementAssignmentOperation,
-	SymbolAssignmentOperation,
+	ReferenceAssignmentOperation,
 	SymbolReferenceOperation,
 	ParameterAssignmentOperation,
 	VariableDeclaratorOperation,
@@ -119,7 +119,7 @@ class AssignmentTargetPatternVisitor{
 		this.referencer.referToSymbolByIdentifier(node);
 		this.operationFn = () => {
 			var symbolReference = this.referencer.getSymbolReference(node);
-			return new SymbolAssignmentOperation(node, symbolReference);
+			return new ReferenceAssignmentOperation(node, symbolReference);
 		};
 	}
 	RestElement(node){
@@ -239,7 +239,7 @@ class FunctionDeclarationVisitor{
 	}
 
 	getOperation(){
-		var assignment = new SymbolAssignmentOperation(this.tree.id, this.referencer.getSymbolReference(this.tree.id));
+		var assignment = new ReferenceAssignmentOperation(this.tree.id, this.referencer.getSymbolReference(this.tree.id));
 		return new FunctionDeclarationOperation(this.tree, assignment, this.parameterFns.map(fn => fn()), this.blockVisitor.getOperation());
 	}
 

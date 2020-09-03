@@ -122,7 +122,7 @@ describe('a program', () => {
 							kind: "VariableDeclarator",
 							tree: tree.body[0].declarations[0],
 							assignment: {
-								kind: "SymbolAssignment",
+								kind: "ReferenceAssignment",
 								tree: tree.body[0].declarations[0].id,
 								reference: {
 									kind: "SymbolReference",
@@ -150,7 +150,7 @@ describe('a program', () => {
 					kind: "FunctionDeclaration",
 					tree: tree.body[2],
 					assignment: {
-						kind: "SymbolAssignment",
+						kind: "ReferenceAssignment",
 						tree: tree.body[2].id,
 						reference: {
 							kind: "SymbolReference",
@@ -167,7 +167,7 @@ describe('a program', () => {
 							kind: "ParameterAssignment",
 							tree: tree.body[2].params[0],
 							assignment: {
-								kind: "SymbolAssignment",
+								kind: "ReferenceAssignment",
 								tree: tree.body[2].params[0],
 								reference: {
 									kind: "SymbolReference",
@@ -290,7 +290,7 @@ describe('a program with a function with a rest element as parameter', () => {
 					kind: "FunctionDeclaration",
 					tree: tree.body[0],
 					assignment: {
-						kind: "SymbolAssignment",
+						kind: "ReferenceAssignment",
 						tree: tree.body[0].id,
 						reference: {
 							kind: "SymbolReference",
@@ -311,7 +311,7 @@ describe('a program with a function with a rest element as parameter', () => {
 								tree: tree.body[0].params[0],
 								assignment: {
 									tree: tree.body[0].params[0].argument,
-									kind: "SymbolAssignment",
+									kind: "ReferenceAssignment",
 									reference: {
 										kind: "SymbolReference",
 										tree: tree.body[0].params[0].argument,
@@ -466,7 +466,7 @@ describe('a program with a function with an object pattern as parameter', () => 
 					kind: "FunctionDeclaration",
 					tree: tree.body[0],
 					assignment: {
-						kind: "SymbolAssignment",
+						kind: "ReferenceAssignment",
 						tree: tree.body[0].id,
 						reference: {
 							kind: "SymbolReference",
@@ -490,7 +490,7 @@ describe('a program with a function with an object pattern as parameter', () => 
 										kind: "PropertyDestructuringAssignment",
 										tree: tree.body[0].params[0].properties[0],
 										valueAssignment: {
-											kind: "SymbolAssignment",
+											kind: "ReferenceAssignment",
 											tree: tree.body[0].params[0].properties[0].value,
 											reference: {
 												kind: "SymbolReference",
@@ -507,7 +507,7 @@ describe('a program with a function with an object pattern as parameter', () => 
 										kind: "PropertyDestructuringAssignment",
 										tree: tree.body[0].params[0].properties[1],
 										valueAssignment: {
-											kind: "SymbolAssignment",
+											kind: "ReferenceAssignment",
 											tree: tree.body[0].params[0].properties[1].value,
 											reference: {
 												kind: "SymbolReference",
@@ -637,7 +637,7 @@ describe('a program with a function with an array pattern as a parameter', () =>
 					kind: "FunctionDeclaration",
 					tree: tree.body[0],
 					assignment: {
-						kind: "SymbolAssignment",
+						kind: "ReferenceAssignment",
 						tree: tree.body[0].id,
 						reference: {
 							kind: "SymbolReference",
@@ -658,7 +658,7 @@ describe('a program with a function with an array pattern as a parameter', () =>
 								tree: tree.body[0].params[0],
 								elements: [
 									{
-										kind: "SymbolAssignment",
+										kind: "ReferenceAssignment",
 										tree: tree.body[0].params[0].elements[0],
 										reference: {
 											kind: "SymbolReference",
@@ -671,7 +671,7 @@ describe('a program with a function with an array pattern as a parameter', () =>
 										}
 									},
 									{
-										kind: "SymbolAssignment",
+										kind: "ReferenceAssignment",
 										tree: tree.body[0].params[0].elements[1],
 										reference: {
 											kind: "SymbolReference",
@@ -763,7 +763,7 @@ describe('a program with a functin with an assignment pattern as a parameter', (
 					kind: "FunctionDeclaration",
 					tree: tree.body[0],
 					assignment: {
-						kind: "SymbolAssignment",
+						kind: "ReferenceAssignment",
 						tree: tree.body[0].id,
 						reference: {
 							kind: "SymbolReference",
@@ -783,7 +783,7 @@ describe('a program with a functin with an assignment pattern as a parameter', (
 								kind: "DefaultAssignment",
 								tree: tree.body[0].params[0],
 								assignment: {
-									kind: "SymbolAssignment",
+									kind: "ReferenceAssignment",
 									tree: tree.body[0].params[0].left,
 									reference: {
 										kind: "SymbolReference",
@@ -913,7 +913,7 @@ describe('a program containing a variable declarator with an object pattern', ()
 										kind: "PropertyDestructuringAssignment",
 										tree: tree.body[0].declarations[0].id.properties[0],
 										valueAssignment: {
-											kind: "SymbolAssignment",
+											kind: "ReferenceAssignment",
 											tree: tree.body[0].declarations[0].id.properties[0].value,
 											reference: {
 												kind: "SymbolReference",
@@ -930,7 +930,7 @@ describe('a program containing a variable declarator with an object pattern', ()
 										kind: "PropertyDestructuringAssignment",
 										tree: tree.body[0].declarations[0].id.properties[1],
 										valueAssignment: {
-											kind: "SymbolAssignment",
+											kind: "ReferenceAssignment",
 											tree: tree.body[0].declarations[0].id.properties[1].value,
 											reference: {
 												kind: "SymbolReference",

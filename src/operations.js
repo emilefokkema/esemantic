@@ -52,11 +52,11 @@ export class SymbolReferenceOperation extends Operation{
 	}
 }
 
-export class SymbolAssignmentOperation extends Operation{
-	constructor(tree, symbolReference) {
+export class ReferenceAssignmentOperation extends Operation{
+	constructor(tree, reference) {
 		super(tree);
-		this.reference = symbolReference;
-		this.kind = "SymbolAssignment";
+		this.reference = reference;
+		this.kind = "ReferenceAssignment";
 	}
 }
 
