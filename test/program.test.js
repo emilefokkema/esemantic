@@ -952,3 +952,122 @@ describe('a program containing a variable declarator with an object pattern', ()
 		});
 	});
 });
+
+describe('a program containing a variable declaration and an assignment', () => {
+	let tree, program;
+
+	beforeEach(() => {
+		//for script `var a;a = 1;`
+		tree = {
+			"type": "Program",
+			"start": 0,
+			"end": 13,
+			"body": [
+			  {
+				"type": "VariableDeclaration",
+				"start": 0,
+				"end": 6,
+				"declarations": [
+				  {
+					"type": "VariableDeclarator",
+					"start": 4,
+					"end": 5,
+					"id": {
+					  "type": "Identifier",
+					  "start": 4,
+					  "end": 5,
+					  "name": "a"
+					},
+					"init": null
+				  }
+				],
+				"kind": "var"
+			  },
+			  {
+				"type": "ExpressionStatement",
+				"start": 6,
+				"end": 12,
+				"expression": {
+				  "type": "AssignmentExpression",
+				  "start": 6,
+				  "end": 11,
+				  "operator": "=",
+				  "left": {
+					"type": "Identifier",
+					"start": 6,
+					"end": 7,
+					"name": "a"
+				  },
+				  "right": {
+					"type": "Literal",
+					"start": 10,
+					"end": 11,
+					"value": 1,
+					"raw": "1"
+				  }
+				}
+			  }
+			],
+			"sourceType": "script"
+		  };
+		program = createProgram(tree);
+	});
+
+	it('should result in this tree', () => {
+		expect(program).toEqual({
+			kind: "Program",
+			tree: tree,
+			operations: [
+				{
+					kind: "VariableDeclaration",
+					tree: tree.body[0],
+					declarators: [
+						{
+							kind: "VariableDeclarator",
+							tree: tree.body[0].declarations[0],
+							assignment: {
+								kind: "ReferenceAssignment",
+								tree: tree.body[0].declarations[0].id,
+								reference: {
+									kind: "SymbolReference",
+									tree: tree.body[0].declarations[0].id,
+									symbol: {
+										name: "a",
+										kind: "var",
+										declaration: tree.body[0].declarations[0].id
+									}
+								}
+							}
+						}
+					]
+				},
+				{
+					kind: "Expression",
+					tree: tree.body[1],
+					operation: {
+						kind: "ValueAssignment",
+						tree: tree.body[1].expression,
+						value: {
+							kind: "Literal",
+							tree: tree.body[1].expression.right,
+							constantValue:1
+						},
+						assignment: {
+							kind: "ReferenceAssignment",
+							tree: tree.body[1].expression.left,
+							reference: {
+								kind: "SymbolReference",
+								tree: tree.body[1].expression.left,
+								symbol: {
+									name: "a",
+									kind: "var",
+									declaration: tree.body[0].declarations[0].id
+								}
+							}
+						}
+					}
+				}
+			]
+		})
+	});
+});

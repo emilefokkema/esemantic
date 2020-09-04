@@ -52,6 +52,23 @@ export class SymbolReferenceOperation extends Operation{
 	}
 }
 
+export class ValueAssignmentOperation extends Operation{
+	constructor(tree, value, assignment){
+		super(tree);
+		this.value = value;
+		this.assignment = assignment;
+		this.kind = "ValueAssignment";
+	}
+}
+
+export class LiteralOperation extends Operation{
+	constructor(tree) {
+		super(tree);
+		this.constantValue = tree.value;
+		this.kind = "Literal";
+	}
+}
+
 export class ReferenceAssignmentOperation extends Operation{
 	constructor(tree, reference) {
 		super(tree);

@@ -13,7 +13,9 @@ import {
 	FunctionDeclarationOperation,
 	ExpressionOperation,
 	BlockOperation,
-	Program} from './operations'
+	Program,
+	ValueAssignmentOperation,
+	LiteralOperation} from './operations'
 
 class Symbol{
 	constructor(identifier, kind) {
@@ -268,11 +270,53 @@ class ExpressionVisitor{
 	}
 
 	getOperation(){
-		return this.operationFn();
+		var result = this.operationFn();
+		return result;
 	}
 
 	Identifier(node){
 		this.operationFn = () => this.referencer.getSymbolReference(node);
+	}
+
+	Literal(node){
+		this.operationFn = () => new LiteralOperation(node);
+	}
+
+	AssignmentExpression(node){
+		var visitor = new AssignmentExpressionVisitor(node, this.scope, this.referencer);
+		this.operationFn = () => visitor.getOperation();
+		return visitor;
+	}
+}
+
+class AssignmentExpressionVisitor{
+	constructor(tree, scope, referencer) {
+		this.tree = tree;
+		this.scope = scope;
+		this.referencer = referencer;
+		this.assignmentVisitor = undefined;
+		this.valueVisitor = undefined;
+	}
+
+	getOperation(){
+		return new ValueAssignmentOperation(this.tree, this.valueVisitor.getOperation(), this.assignmentVisitor.getOperation());
+	}
+
+	Identifier(node, useVisitor){
+		if(node === this.tree.left){
+			var visitor = new AssignmentTargetPatternVisitor(this.referencer);
+			this.assignmentVisitor = visitor;
+			return useVisitor(visitor);
+		}
+	}
+
+	Expression(node, useVisitor){
+		if(node === this.tree.left){
+			return; //todo left is an expression that's not a pattern
+		}
+		var visitor = new ExpressionVisitor(this.scope, this.referencer);
+		this.valueVisitor = visitor;
+		return useVisitor(visitor);
 	}
 }
 
