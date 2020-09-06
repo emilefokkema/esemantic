@@ -171,6 +171,12 @@ class AssignmentPatternVisitor{
 	}
 
 	Expression(node, useVisitor){
+		var visitor = new ExpressionVisitor(this.scope, this.referencer);
+		this.rightVisitor = visitor;
+		return useVisitor(this.rightVisitor);
+	}
+
+	Identifier(node, useVisitor){
 		if(node === this.tree.left){
 			var visitor = new AssignmentTargetPatternVisitor(this.scope, this.referencer);
 			this.leftVisitor = visitor;
@@ -179,6 +185,12 @@ class AssignmentPatternVisitor{
 		var visitor = new ExpressionVisitor(this.scope, this.referencer);
 		this.rightVisitor = visitor;
 		return useVisitor(this.rightVisitor);
+	}
+
+	Pattern(node, useVisitor){
+		var visitor = new AssignmentTargetPatternVisitor(this.scope, this.referencer);
+		this.leftVisitor = visitor;
+		return useVisitor(visitor);
 	}
 }
 

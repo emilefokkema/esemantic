@@ -814,6 +814,153 @@ describe('a program with a functin with an assignment pattern as a parameter', (
 	});
 });
 
+describe('a program with a function with as assignment pattern with an object pattern as left as parameter', () => {
+	let program, tree;
+
+	beforeEach(() => {
+		//for script `function a({b:c} = d){}`
+		tree = {
+			"type": "Program",
+			"start": 0,
+			"end": 24,
+			"body": [
+			  {
+				"type": "FunctionDeclaration",
+				"start": 0,
+				"end": 23,
+				"id": {
+				  "type": "Identifier",
+				  "start": 9,
+				  "end": 10,
+				  "name": "a"
+				},
+				"expression": false,
+				"generator": false,
+				"async": false,
+				"params": [
+				  {
+					"type": "AssignmentPattern",
+					"start": 11,
+					"end": 20,
+					"left": {
+					  "type": "ObjectPattern",
+					  "start": 11,
+					  "end": 16,
+					  "properties": [
+						{
+						  "type": "Property",
+						  "start": 12,
+						  "end": 15,
+						  "method": false,
+						  "shorthand": false,
+						  "computed": false,
+						  "key": {
+							"type": "Identifier",
+							"start": 12,
+							"end": 13,
+							"name": "b"
+						  },
+						  "value": {
+							"type": "Identifier",
+							"start": 14,
+							"end": 15,
+							"name": "c"
+						  },
+						  "kind": "init"
+						}
+					  ]
+					},
+					"right": {
+					  "type": "Identifier",
+					  "start": 19,
+					  "end": 20,
+					  "name": "d"
+					}
+				  }
+				],
+				"body": {
+				  "type": "BlockStatement",
+				  "start": 21,
+				  "end": 23,
+				  "body": []
+				}
+			  }
+			],
+			"sourceType": "script"
+		  };
+		program = createProgram(tree);
+	});
+
+	it('should result in this tree', () => {
+		expect(program).toEqual({
+			kind: "Program",
+			tree: tree,
+			operations: [
+				{
+					kind: "FunctionDeclaration",
+					tree: tree.body[0],
+					assignment: {
+						kind: "ReferenceAssignment",
+						tree: tree.body[0].id,
+						reference: {
+							kind: "SymbolReference",
+							tree: tree.body[0].id,
+							symbol: {
+								name: "a",
+								declaration: tree.body[0].id,
+								kind: "var"
+							}
+						}
+					},
+					params: [
+						{
+							kind: "ParameterAssignment",
+							tree: tree.body[0].params[0],
+							assignment: {
+								kind: "DefaultAssignment",
+								tree: tree.body[0].params[0],
+								assignment: {
+									kind: "ObjectDestructuringAssignment",
+									tree: tree.body[0].params[0].left,
+									properties: [
+										{
+											kind: "PropertyDestructuringAssignment",
+											tree: tree.body[0].params[0].left.properties[0],
+											valueAssignment: {
+												kind: "ReferenceAssignment",
+												tree: tree.body[0].params[0].left.properties[0].value,
+												reference: {
+													kind: "SymbolReference",
+													tree: tree.body[0].params[0].left.properties[0].value,
+													symbol: {
+														name: "c",
+														kind: "var",
+														declaration: tree.body[0].params[0].left.properties[0].value
+													}
+												}
+											}
+										}
+									]
+								},
+								defaultValue: {
+									kind: "SymbolReference",
+									tree: tree.body[0].params[0].right,
+									symbol: undefined
+								}
+							}
+						}
+					],
+					body: {
+						kind: "Block",
+						tree: tree.body[0].body,
+						operations: []
+					}
+				}
+			]
+		})
+	});
+});
+
 describe('a program containing a variable declarator with an object pattern', () => {
 	let program, tree;
 
