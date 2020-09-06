@@ -74,7 +74,8 @@ class DeclaringSymbolReferencer extends SymbolReferencer{
 }
 
 class VariableDeclarationVisitor{
-	constructor(referencer, tree){
+	constructor(scope, referencer, tree){
+		this.scope = scope;
 		this.referencer = referencer;
 		this.tree = tree;
 		this.declaratorVisitors = [];
@@ -83,14 +84,15 @@ class VariableDeclarationVisitor{
 		return new VariableDeclarationOperation(this.tree, this.declaratorVisitors.map(v => v.getOperation()));
 	}
 	VariableDeclarator(node){
-		var visitor = new VariableDeclaratorVisitor(this.referencer, node);
+		var visitor = new VariableDeclaratorVisitor(this.scope, this.referencer, node);
 		this.declaratorVisitors.push(visitor);
 		return visitor;
 	}
 }
 
 class VariableDeclaratorVisitor{
-	constructor(referencer, tree){
+	constructor(scope, referencer, tree){
+		this.scope = scope;
 		this.tree = tree;
 		this.referencer = referencer;
 		this.idVisitor = undefined;
@@ -102,7 +104,7 @@ class VariableDeclaratorVisitor{
 
 	Pattern(node, useVisitor){
 		if(node === this.tree.id){
-			var visitor = new AssignmentTargetPatternVisitor(this.referencer);
+			var visitor = new AssignmentTargetPatternVisitor(this.scope, this.referencer);
 			this.idVisitor = visitor;
 			return useVisitor(visitor);
 		}
@@ -110,7 +112,8 @@ class VariableDeclaratorVisitor{
 }
 
 class AssignmentTargetPatternVisitor{
-	constructor(referencer){
+	constructor(scope, referencer){
+		this.scope = scope;
 		this.referencer = referencer;
 		this.operationFn = undefined;
 	}
@@ -125,28 +128,28 @@ class AssignmentTargetPatternVisitor{
 		};
 	}
 	RestElement(node){
-		var visitor = new AssignmentTargetPatternVisitor(this.referencer);
+		var visitor = new AssignmentTargetPatternVisitor(this.scope, this.referencer);
 		this.operationFn = () => {
 			return new RestElementAssignmentOperation(node, visitor.getOperation());
 		};
 		return visitor;
 	}
 	ObjectPattern(node){
-		var visitor = new ObjectPatternVisitor(this.referencer, node);
+		var visitor = new ObjectPatternVisitor(this.scope, this.referencer, node);
 		this.operationFn = () => {
 			return visitor.getOperation();
 		};
 		return visitor;
 	}
 	ArrayPattern(node){
-		var visitor = new ArrayPatternVisitor(this.referencer, node);
+		var visitor = new ArrayPatternVisitor(this.scope, this.referencer, node);
 		this.operationFn = () => {
 			return visitor.getOperation();
 		};
 		return visitor;
 	}
 	AssignmentPattern(node){
-		var visitor = new AssignmentPatternVisitor(this.referencer, node);
+		var visitor = new AssignmentPatternVisitor(this.scope, this.referencer, node);
 		this.operationFn = () => {
 			return visitor.getOperation();
 		};
@@ -155,27 +158,33 @@ class AssignmentTargetPatternVisitor{
 }
 
 class AssignmentPatternVisitor{
-	constructor(referencer, tree){
+	constructor(scope, referencer, tree){
+		this.scope = scope;
 		this.referencer = referencer;
 		this.tree = tree;
 		this.leftVisitor = undefined;
+		this.rightVisitor = undefined;
 	}
 
 	getOperation(){
-		return new DefaultAssignmentOperation(this.tree, this.leftVisitor.getOperation());
+		return new DefaultAssignmentOperation(this.tree, this.leftVisitor.getOperation(), this.rightVisitor.getOperation());
 	}
 
 	Expression(node, useVisitor){
 		if(node === this.tree.left){
-			var visitor = new AssignmentTargetPatternVisitor(this.referencer);
+			var visitor = new AssignmentTargetPatternVisitor(this.scope, this.referencer);
 			this.leftVisitor = visitor;
 			return useVisitor(visitor);
 		}
+		var visitor = new ExpressionVisitor(this.scope, this.referencer);
+		this.rightVisitor = visitor;
+		return useVisitor(this.rightVisitor);
 	}
 }
 
 class PropertyAssignmentVisitor{
-	constructor(referencer, tree){
+	constructor(scope, referencer, tree){
+		this.scope = scope;
 		this.referencer = referencer;
 		this.tree = tree;
 		this.valueVisitor = undefined;
@@ -189,14 +198,15 @@ class PropertyAssignmentVisitor{
 		if(node === this.tree.key){
 			return;
 		}
-		var visitor = new AssignmentTargetPatternVisitor(this.referencer);
+		var visitor = new AssignmentTargetPatternVisitor(this.scope, this.referencer);
 		this.valueVisitor = visitor;
 		return useVisitor(visitor);
 	}
 }
 
 class ObjectPatternVisitor{
-	constructor(referencer, tree){
+	constructor(scope, referencer, tree){
+		this.scope = scope;
 		this.tree = tree;
 		this.referencer = referencer;
 		this.propertyVisitors = [];
@@ -207,14 +217,15 @@ class ObjectPatternVisitor{
 	}
 
 	Property(node){
-		var visitor = new PropertyAssignmentVisitor(this.referencer, node);
+		var visitor = new PropertyAssignmentVisitor(this.scope, this.referencer, node);
 		this.propertyVisitors.push(visitor);
 		return visitor;
 	}
 }
 
 class ArrayPatternVisitor{
-	constructor(referencer, tree){
+	constructor(scope, referencer, tree){
+		this.scope = scope;
 		this.tree = tree;
 		this.referencer = referencer;
 		this.assignmentVisitors = [];
@@ -225,17 +236,18 @@ class ArrayPatternVisitor{
 	}
 
 	Pattern(node, useVisitor){
-		var visitor = new AssignmentTargetPatternVisitor(this.referencer);
+		var visitor = new AssignmentTargetPatternVisitor(this.scope, this.referencer);
 		this.assignmentVisitors.push(visitor);
 		return useVisitor(visitor);
 	}
 }
 
 class FunctionDeclarationVisitor{
-	constructor(tree, functionScope, referencer){
+	constructor(tree, scope, referencer){
+		this.scope = scope;
 		this.referencer = referencer;
 		this.tree = tree;
-		this.functionScope = functionScope;
+		this.functionScope = scope.createFunctionScope();
 		this.parameterFns = [];
 		this.blockVisitor = undefined;
 	}
@@ -255,7 +267,7 @@ class FunctionDeclarationVisitor{
 		if(node === this.tree.id){
 			this.referencer.referToSymbolByIdentifier(node);
 		}else{
-			var visitor = new AssignmentTargetPatternVisitor(new DeclaringSymbolReferencer(this.functionScope, 'var'));
+			var visitor = new AssignmentTargetPatternVisitor(this.scope, new DeclaringSymbolReferencer(this.functionScope, 'var'));
 			this.parameterFns.push(() => new ParameterAssignmentOperation(node, visitor.getOperation()));
 			return useVisitor(visitor);
 		}
@@ -304,7 +316,7 @@ class AssignmentExpressionVisitor{
 
 	Identifier(node, useVisitor){
 		if(node === this.tree.left){
-			var visitor = new AssignmentTargetPatternVisitor(this.referencer);
+			var visitor = new AssignmentTargetPatternVisitor(this.scope, this.referencer);
 			this.assignmentVisitor = visitor;
 			return useVisitor(visitor);
 		}
@@ -357,12 +369,12 @@ class BlockVisitor{
 	}
 
 	VariableDeclaration(node){
-		var visitor = new VariableDeclarationVisitor(new DeclaringSymbolReferencer(this.scope, node.kind), node);
+		var visitor = new VariableDeclarationVisitor(this.scope, new DeclaringSymbolReferencer(this.scope, node.kind), node);
 		this.visitors.push(visitor);
 		return visitor;
 	}
 	FunctionDeclaration(node){
-		var visitor = new FunctionDeclarationVisitor(node, this.scope.createFunctionScope(), new DeclaringSymbolReferencer(this.scope, 'var'));
+		var visitor = new FunctionDeclarationVisitor(node, this.scope, new DeclaringSymbolReferencer(this.scope, 'var'));
 		this.visitors.push(visitor);
 		return visitor;
 	}

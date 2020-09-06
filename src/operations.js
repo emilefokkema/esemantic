@@ -29,9 +29,10 @@ export class PropertyDestructuringAssignmentOperation extends Operation{
 }
 
 export class DefaultAssignmentOperation extends Operation{
-	constructor(tree, assignmentOperation){
+	constructor(tree, assignmentOperation, defaultValue){
 		super(tree);
 		this.assignment = assignmentOperation;
+		this.defaultValue = defaultValue;
 		this.kind = "DefaultAssignment";
 	}
 }

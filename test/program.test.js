@@ -794,6 +794,11 @@ describe('a program with a functin with an assignment pattern as a parameter', (
 											kind: "var"
 										}
 									}
+								},
+								defaultValue: {
+									kind: "Literal",
+									tree: tree.body[0].params[0].right,
+									constantValue: 5
 								}
 							}
 						}
