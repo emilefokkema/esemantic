@@ -1223,3 +1223,329 @@ describe('a program containing a variable declaration and an assignment', () => 
 		})
 	});
 });
+
+describe('a program containing a function with default parameters', () => {
+	let tree, program;
+
+	beforeEach(() => {
+		// for script `var a;function b(c = a, d = c){var a;a;d;c;}`
+		tree = {
+			"type": "Program",
+			"start": 0,
+			"end": 44,
+			"body": [
+				{
+					"type": "VariableDeclaration",
+					"start": 0,
+					"end": 6,
+					"declarations": [
+						{
+							"type": "VariableDeclarator",
+							"start": 4,
+							"end": 5,
+							"id": {
+								"type": "Identifier",
+								"start": 4,
+								"end": 5,
+								"name": "a"
+							},
+							"init": null
+						}
+					],
+					"kind": "var"
+				},
+				{
+					"type": "FunctionDeclaration",
+					"start": 6,
+					"end": 44,
+					"id": {
+						"type": "Identifier",
+						"start": 15,
+						"end": 16,
+						"name": "b"
+					},
+					"expression": false,
+					"generator": false,
+					"async": false,
+					"params": [
+						{
+							"type": "AssignmentPattern",
+							"start": 17,
+							"end": 22,
+							"left": {
+								"type": "Identifier",
+								"start": 17,
+								"end": 18,
+								"name": "c"
+							},
+							"right": {
+								"type": "Identifier",
+								"start": 21,
+								"end": 22,
+								"name": "a"
+							}
+						},
+						{
+							"type": "AssignmentPattern",
+							"start": 24,
+							"end": 29,
+							"left": {
+								"type": "Identifier",
+								"start": 24,
+								"end": 25,
+								"name": "d"
+							},
+							"right": {
+								"type": "Identifier",
+								"start": 28,
+								"end": 29,
+								"name": "c"
+							}
+						}
+					],
+					"body": {
+						"type": "BlockStatement",
+						"start": 30,
+						"end": 44,
+						"body": [
+							{
+								"type": "VariableDeclaration",
+								"start": 31,
+								"end": 37,
+								"declarations": [
+									{
+										"type": "VariableDeclarator",
+										"start": 35,
+										"end": 36,
+										"id": {
+											"type": "Identifier",
+											"start": 35,
+											"end": 36,
+											"name": "a"
+										},
+										"init": null
+									}
+								],
+								"kind": "var"
+							},
+							{
+								"type": "ExpressionStatement",
+								"start": 37,
+								"end": 39,
+								"expression": {
+									"type": "Identifier",
+									"start": 37,
+									"end": 38,
+									"name": "a"
+								}
+							},
+							{
+								"type": "ExpressionStatement",
+								"start": 39,
+								"end": 41,
+								"expression": {
+									"type": "Identifier",
+									"start": 39,
+									"end": 40,
+									"name": "d"
+								}
+							},
+							{
+								"type": "ExpressionStatement",
+								"start": 41,
+								"end": 43,
+								"expression": {
+									"type": "Identifier",
+									"start": 41,
+									"end": 42,
+									"name": "c"
+								}
+							}
+						]
+					}
+				}
+			],
+			"sourceType": "script"
+		}
+		program = createProgram(tree);
+	});
+
+	it('should result in this tree', () => {
+		expect(program).toEqual({
+			kind: "Program",
+			tree: tree,
+			operations: [
+				{
+					kind: "VariableDeclaration",
+					tree: tree.body[0],
+					declarators: [
+						{
+							kind: "VariableDeclarator",
+							tree: tree.body[0].declarations[0],
+							assignment: {
+								kind: "ReferenceAssignment",
+								tree: tree.body[0].declarations[0].id,
+								reference: {
+									kind: "SymbolReference",
+									tree: tree.body[0].declarations[0].id,
+									symbol: {
+										name: "a",
+										kind: "var",
+										declaration: tree.body[0].declarations[0].id
+									}
+								}
+							}
+						}
+					]
+				},
+				{
+					kind: "FunctionDeclaration",
+					tree: tree.body[1],
+					assignment: {
+						kind: "ReferenceAssignment",
+						tree: tree.body[1].id,
+						reference: {
+							kind: "SymbolReference",
+							tree: tree.body[1].id,
+							symbol: {
+								name: "b",
+								kind: "var",
+								declaration: tree.body[1].id
+							}
+						}
+					},
+					params: [
+						{
+							kind: "ParameterAssignment",
+							tree: tree.body[1].params[0],
+							assignment: {
+								kind: "DefaultAssignment",
+								tree: tree.body[1].params[0],
+								assignment: {
+									kind: "ReferenceAssignment",
+									tree: tree.body[1].params[0].left,
+									reference: {
+										kind: "SymbolReference",
+										tree: tree.body[1].params[0].left,
+										symbol: {
+											name: "c",
+											kind: "var",
+											declaration: tree.body[1].params[0].left
+										}
+									}
+								},
+								defaultValue: {
+									kind: "SymbolReference",
+									tree: tree.body[1].params[0].right,
+									symbol: {
+										name: "a",
+										kind: "var",
+										declaration: tree.body[0].declarations[0].id
+									}
+								}
+							}
+						},
+						{
+							kind: "ParameterAssignment",
+							tree: tree.body[1].params[1],
+							assignment: {
+								kind: "DefaultAssignment",
+								tree: tree.body[1].params[1],
+								assignment: {
+									kind: "ReferenceAssignment",
+									tree: tree.body[1].params[1].left,
+									reference: {
+										kind: "SymbolReference",
+										tree: tree.body[1].params[1].left,
+										symbol: {
+											name: "d",
+											kind: "var",
+											declaration: tree.body[1].params[1].left
+										}
+									}
+								},
+								defaultValue: {
+									kind: "SymbolReference",
+									tree: tree.body[1].params[1].right,
+									symbol: {
+										name: "c",
+										kind: "var",
+										declaration: tree.body[1].params[0].left
+									}
+								}
+							}
+						}
+					],
+					body: {
+						kind: "Block",
+						tree: tree.body[1].body,
+						operations: [
+							{
+								kind: "VariableDeclaration",
+								tree: tree.body[1].body.body[0],
+								declarators: [
+									{
+										kind: "VariableDeclarator",
+										tree: tree.body[1].body.body[0].declarations[0],
+										assignment: {
+											kind: "ReferenceAssignment",
+											tree: tree.body[1].body.body[0].declarations[0].id,
+											reference: {
+												kind: "SymbolReference",
+												tree: tree.body[1].body.body[0].declarations[0].id,
+												symbol: {
+													name: "a",
+													kind: "var",
+													declaration: tree.body[1].body.body[0].declarations[0].id
+												}
+											}
+										}
+									}
+								]
+							},
+							{
+								kind: "Expression",
+								tree: tree.body[1].body.body[1],
+								operation: {
+									kind: "SymbolReference",
+									tree: tree.body[1].body.body[1].expression,
+									symbol: {
+										name: "a",
+										kind: "var",
+										declaration: tree.body[1].body.body[0].declarations[0].id
+									}
+								}
+							},
+							{
+								kind: "Expression",
+								tree: tree.body[1].body.body[2],
+								operation: {
+									kind: "SymbolReference",
+									tree: tree.body[1].body.body[2].expression,
+									symbol: {
+										name: "d",
+										kind: "var",
+										declaration: tree.body[1].params[1].left
+									}
+								}
+							},
+							{
+								kind: "Expression",
+								tree: tree.body[1].body.body[3],
+								operation: {
+									kind: "SymbolReference",
+									tree: tree.body[1].body.body[3].expression,
+									symbol: {
+										name: "c",
+										kind: "var",
+										declaration: tree.body[1].params[0].left
+									}
+								}
+							}
+						]
+					}
+				}
+			]
+		});
+	});
+});

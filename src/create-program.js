@@ -43,6 +43,9 @@ class BlockScope{
 			return this.parentScope.getSymbol(name);
 		}
 	}
+	createBlockScope(){
+		return new BlockScope(this);
+	}
 	createFunctionScope(){
 		return new FunctionScope(this);
 	}
@@ -259,7 +262,8 @@ class FunctionDeclarationVisitor{
 		this.scope = scope;
 		this.referencer = referencer;
 		this.tree = tree;
-		this.functionScope = scope.createFunctionScope();
+		this.parameterScope = scope.createBlockScope();
+		this.functionScope = this.parameterScope.createFunctionScope();
 		this.parameterFns = [];
 		this.blockVisitor = undefined;
 	}
@@ -279,7 +283,7 @@ class FunctionDeclarationVisitor{
 		if(node === this.tree.id){
 			this.referencer.referToSymbolByIdentifier(node);
 		}else{
-			var visitor = new AssignmentTargetPatternVisitor(this.scope, new DeclaringSymbolReferencer(this.functionScope, 'var'));
+			var visitor = new AssignmentTargetPatternVisitor(this.scope, new DeclaringSymbolReferencer(this.parameterScope, 'var'));
 			this.parameterFns.push(() => new ParameterAssignmentOperation(node, visitor.getOperation()));
 			return useVisitor(visitor);
 		}
