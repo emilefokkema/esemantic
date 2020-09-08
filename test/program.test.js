@@ -133,7 +133,8 @@ describe('a program', () => {
 										kind: "var"
 									}
 								}
-							}
+							},
+							init: null
 						}
 					]
 				},
@@ -965,83 +966,127 @@ describe('a program containing a variable declarator with an object pattern', ()
 	let program, tree;
 
 	beforeEach(() => {
-		// for script `var {a:b, c} = {};`
+		// for script `var {a:b, c} = {a: 1, c: d};`
 		tree = {
 			"type": "Program",
 			"start": 0,
-			"end": 19,
+			"end": 28,
 			"body": [
-			  {
-				"type": "VariableDeclaration",
-				"start": 0,
-				"end": 18,
-				"declarations": [
-				  {
-					"type": "VariableDeclarator",
-					"start": 4,
-					"end": 17,
-					"id": {
-					  "type": "ObjectPattern",
-					  "start": 4,
-					  "end": 12,
-					  "properties": [
+				{
+					"type": "VariableDeclaration",
+					"start": 0,
+					"end": 28,
+					"declarations": [
 						{
-						  "type": "Property",
-						  "start": 5,
-						  "end": 8,
-						  "method": false,
-						  "shorthand": false,
-						  "computed": false,
-						  "key": {
-							"type": "Identifier",
-							"start": 5,
-							"end": 6,
-							"name": "a"
-						  },
-						  "value": {
-							"type": "Identifier",
-							"start": 7,
-							"end": 8,
-							"name": "b"
-						  },
-						  "kind": "init"
-						},
-						{
-						  "type": "Property",
-						  "start": 10,
-						  "end": 11,
-						  "method": false,
-						  "shorthand": true,
-						  "computed": false,
-						  "key": {
-							"type": "Identifier",
-							"start": 10,
-							"end": 11,
-							"name": "c"
-						  },
-						  "kind": "init",
-						  "value": {
-							"type": "Identifier",
-							"start": 10,
-							"end": 11,
-							"name": "c"
-						  }
+							"type": "VariableDeclarator",
+							"start": 4,
+							"end": 27,
+							"id": {
+								"type": "ObjectPattern",
+								"start": 4,
+								"end": 12,
+								"properties": [
+									{
+										"type": "Property",
+										"start": 5,
+										"end": 8,
+										"method": false,
+										"shorthand": false,
+										"computed": false,
+										"key": {
+											"type": "Identifier",
+											"start": 5,
+											"end": 6,
+											"name": "a"
+										},
+										"value": {
+											"type": "Identifier",
+											"start": 7,
+											"end": 8,
+											"name": "b"
+										},
+										"kind": "init"
+									},
+									{
+										"type": "Property",
+										"start": 10,
+										"end": 11,
+										"method": false,
+										"shorthand": true,
+										"computed": false,
+										"key": {
+											"type": "Identifier",
+											"start": 10,
+											"end": 11,
+											"name": "c"
+										},
+										"kind": "init",
+										"value": {
+											"type": "Identifier",
+											"start": 10,
+											"end": 11,
+											"name": "c"
+										}
+									}
+								]
+							},
+							"init": {
+								"type": "ObjectExpression",
+								"start": 15,
+								"end": 27,
+								"properties": [
+									{
+										"type": "Property",
+										"start": 16,
+										"end": 20,
+										"method": false,
+										"shorthand": false,
+										"computed": false,
+										"key": {
+											"type": "Identifier",
+											"start": 16,
+											"end": 17,
+											"name": "a"
+										},
+										"value": {
+											"type": "Literal",
+											"start": 19,
+											"end": 20,
+											"value": 1,
+											"raw": "1"
+										},
+										"kind": "init"
+									},
+									{
+										"type": "Property",
+										"start": 22,
+										"end": 26,
+										"method": false,
+										"shorthand": false,
+										"computed": false,
+										"key": {
+											"type": "Identifier",
+											"start": 22,
+											"end": 23,
+											"name": "c"
+										},
+										"value": {
+											"type": "Identifier",
+											"start": 25,
+											"end": 26,
+											"name": "d"
+										},
+										"kind": "init"
+									}
+								]
+							}
 						}
-					  ]
-					},
-					"init": {
-					  "type": "ObjectExpression",
-					  "start": 15,
-					  "end": 17,
-					  "properties": []
-					}
-				  }
-				],
-				"kind": "var"
-			  }
+					],
+					"kind": "var"
+				}
 			],
 			"sourceType": "script"
-		  };
+		};
 		program = createProgram(tree);
 	});
 
@@ -1093,6 +1138,30 @@ describe('a program containing a variable declarator with an object pattern', ()
 													kind: "var"
 												}
 											}
+										}
+									}
+								]
+							},
+							init: {
+								kind: "Object",
+								tree: tree.body[0].declarations[0].init,
+								properties: [
+									{
+										kind: "ObjectProperty",
+										tree: tree.body[0].declarations[0].init.properties[0],
+										value: {
+											kind: "Literal",
+											tree: tree.body[0].declarations[0].init.properties[0].value,
+											constantValue: 1
+										}
+									},
+									{
+										kind: "ObjectProperty",
+										tree: tree.body[0].declarations[0].init.properties[1],
+										value: {
+											kind: "SymbolReference",
+											tree: tree.body[0].declarations[0].init.properties[1].value,
+											symbol: undefined
 										}
 									}
 								]
@@ -1189,7 +1258,8 @@ describe('a program containing a variable declaration and an assignment', () => 
 										declaration: tree.body[0].declarations[0].id
 									}
 								}
-							}
+							},
+							init: null
 						}
 					]
 				},
@@ -1394,7 +1464,8 @@ describe('a program containing a function with default parameters', () => {
 										declaration: tree.body[0].declarations[0].id
 									}
 								}
-							}
+							},
+							init: null
 						}
 					]
 				},
@@ -1499,7 +1570,8 @@ describe('a program containing a function with default parameters', () => {
 													declaration: tree.body[1].body.body[0].declarations[0].id
 												}
 											}
-										}
+										},
+										init: null
 									}
 								]
 							},

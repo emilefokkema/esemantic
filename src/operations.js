@@ -95,10 +95,27 @@ export class ParameterAssignmentOperation extends Operation{
 }
 
 export class VariableDeclaratorOperation extends Operation{
-	constructor(tree, assignmentOperation){
+	constructor(tree, assignmentOperation, init){
 		super(tree);
 		this.assignment = assignmentOperation;
+		this.init = init;
 		this.kind = "VariableDeclarator";
+	}
+}
+
+export class ObjectOperation extends Operation{
+	constructor(tree, properties) {
+		super(tree);
+		this.properties = properties;
+		this.kind = "Object";
+	}
+}
+
+export class ObjectPropertyOperation extends Operation{
+	constructor(tree, value) {
+		super(tree);
+		this.value = value;
+		this.kind = "ObjectProperty"
 	}
 }
 

@@ -15,7 +15,9 @@ import {
 	BlockOperation,
 	Program,
 	ValueAssignmentOperation,
-	LiteralOperation} from './operations'
+	LiteralOperation,
+	ObjectOperation,
+	ObjectPropertyOperation} from './operations'
 
 class Symbol{
 	constructor(identifier, kind) {
@@ -77,9 +79,10 @@ class DeclaringSymbolReferencer extends SymbolReferencer{
 }
 
 class VariableDeclarationVisitor{
-	constructor(scope, referencer, tree){
+	constructor(scope, idReferencer, initReferencer, tree){
 		this.scope = scope;
-		this.referencer = referencer;
+		this.idReferencer = idReferencer;
+		this.initReferencer = initReferencer;
 		this.tree = tree;
 		this.declaratorVisitors = [];
 	}
@@ -87,30 +90,44 @@ class VariableDeclarationVisitor{
 		return new VariableDeclarationOperation(this.tree, this.declaratorVisitors.map(v => v.getOperation()));
 	}
 	VariableDeclarator(node){
-		var visitor = new VariableDeclaratorVisitor(this.scope, this.referencer, node);
+		var visitor = new VariableDeclaratorVisitor(this.scope, this.idReferencer, this.initReferencer, node);
 		this.declaratorVisitors.push(visitor);
 		return visitor;
 	}
 }
 
 class VariableDeclaratorVisitor{
-	constructor(scope, referencer, tree){
+	constructor(scope, idReferencer, initReferencer, tree){
 		this.scope = scope;
 		this.tree = tree;
-		this.referencer = referencer;
+		this.idReferencer = idReferencer;
+		this.initReferencer = initReferencer;
 		this.idVisitor = undefined;
+		this.initVisitor = undefined;
 	}
 
 	getOperation(){
-		return new VariableDeclaratorOperation(this.tree, this.idVisitor.getOperation());
+		return new VariableDeclaratorOperation(this.tree, this.idVisitor.getOperation(), this.initVisitor ? this.initVisitor.getOperation() : null);
 	}
 
 	Pattern(node, useVisitor){
+		var visitor = new AssignmentTargetPatternVisitor(this.scope, this.idReferencer);
+		this.idVisitor = visitor;
+		return useVisitor(visitor);
+	}
+
+	Identifier(node, useVisitor){
 		if(node === this.tree.id){
-			var visitor = new AssignmentTargetPatternVisitor(this.scope, this.referencer);
+			var visitor = new AssignmentTargetPatternVisitor(this.scope, this.idReferencer);
 			this.idVisitor = visitor;
 			return useVisitor(visitor);
 		}
+	}
+
+	Expression(node, useVisitor){
+		var visitor = new ExpressionVisitor(this.scope, this.initReferencer);
+		this.initVisitor = visitor;
+		return useVisitor(visitor);
 	}
 }
 
@@ -315,6 +332,53 @@ class ExpressionVisitor{
 		this.operationFn = () => visitor.getOperation();
 		return visitor;
 	}
+
+	ObjectExpression(node){
+		var visitor = new ObjectExpressionVisitor(node, this.scope, this.referencer);
+		this.operationFn = () => visitor.getOperation();
+		return visitor;
+	}
+}
+
+class ObjectExpressionVisitor{
+	constructor(tree, scope, referencer) {
+		this.tree = tree;
+		this.scope = scope;
+		this.referencer = referencer;
+		this.propertyVisitors = [];
+	}
+
+	getOperation(){
+		return new ObjectOperation(this.tree, this.propertyVisitors.map(v => v.getOperation()))
+	}
+
+	Property(node){
+		var visitor = new PropertyVisitor(node, this.scope, this.referencer);
+		this.propertyVisitors.push(visitor);
+		return visitor;
+	}
+}
+
+class PropertyVisitor{
+	constructor(tree, scope, referencer) {
+		this.tree = tree;
+		this.scope = scope;
+		this.referencer = referencer;
+		this.valueVisitor = undefined;
+	}
+
+	getOperation(){
+		return new ObjectPropertyOperation(this.tree, this.valueVisitor.getOperation());
+	}
+
+	Expression(node, useVisitor){
+		if(node === this.tree.value){
+			var visitor = new ExpressionVisitor(this.scope, this.referencer);
+			this.valueVisitor = visitor;
+			return useVisitor(visitor);
+		}
+	}
+
 }
 
 class AssignmentExpressionVisitor{
@@ -385,7 +449,7 @@ class BlockVisitor{
 	}
 
 	VariableDeclaration(node){
-		var visitor = new VariableDeclarationVisitor(this.scope, new DeclaringSymbolReferencer(this.scope, node.kind), node);
+		var visitor = new VariableDeclarationVisitor(this.scope, new DeclaringSymbolReferencer(this.scope, node.kind), new SymbolReferencer(this.scope), node);
 		this.visitors.push(visitor);
 		return visitor;
 	}
