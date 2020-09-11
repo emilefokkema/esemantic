@@ -1294,6 +1294,225 @@ describe('a program containing a variable declaration and an assignment', () => 
 	});
 });
 
+describe('a program containing a variable declaration and a destructuring assignment', () => {
+	let tree, program;
+
+	beforeEach(() => {
+		//for script `var a, b;({a, b} = c)`
+		tree = {
+			"type": "Program",
+			"start": 0,
+			"end": 22,
+			"body": [
+			  {
+				"type": "VariableDeclaration",
+				"start": 0,
+				"end": 9,
+				"declarations": [
+				  {
+					"type": "VariableDeclarator",
+					"start": 4,
+					"end": 5,
+					"id": {
+					  "type": "Identifier",
+					  "start": 4,
+					  "end": 5,
+					  "name": "a"
+					},
+					"init": null
+				  },
+				  {
+					"type": "VariableDeclarator",
+					"start": 7,
+					"end": 8,
+					"id": {
+					  "type": "Identifier",
+					  "start": 7,
+					  "end": 8,
+					  "name": "b"
+					},
+					"init": null
+				  }
+				],
+				"kind": "var"
+			  },
+			  {
+				"type": "ExpressionStatement",
+				"start": 9,
+				"end": 21,
+				"expression": {
+				  "type": "AssignmentExpression",
+				  "start": 10,
+				  "end": 20,
+				  "operator": "=",
+				  "left": {
+					"type": "ObjectPattern",
+					"start": 10,
+					"end": 16,
+					"properties": [
+					  {
+						"type": "Property",
+						"start": 11,
+						"end": 12,
+						"method": false,
+						"shorthand": true,
+						"computed": false,
+						"key": {
+						  "type": "Identifier",
+						  "start": 11,
+						  "end": 12,
+						  "name": "a"
+						},
+						"kind": "init",
+						"value": {
+						  "type": "Identifier",
+						  "start": 11,
+						  "end": 12,
+						  "name": "a"
+						}
+					  },
+					  {
+						"type": "Property",
+						"start": 14,
+						"end": 15,
+						"method": false,
+						"shorthand": true,
+						"computed": false,
+						"key": {
+						  "type": "Identifier",
+						  "start": 14,
+						  "end": 15,
+						  "name": "b"
+						},
+						"kind": "init",
+						"value": {
+						  "type": "Identifier",
+						  "start": 14,
+						  "end": 15,
+						  "name": "b"
+						}
+					  }
+					]
+				  },
+				  "right": {
+					"type": "Identifier",
+					"start": 19,
+					"end": 20,
+					"name": "c"
+				  }
+				}
+			  }
+			],
+			"sourceType": "script"
+		  }
+		program = createProgram(tree);
+	});
+
+	it('should result in this tree', () => {
+		expect(program).toEqual({
+			kind: "Program",
+			tree: tree,
+			operations: [
+				{
+					kind: "VariableDeclaration",
+					tree: tree.body[0],
+					declarators: [
+						{
+							kind: "VariableDeclarator",
+							tree: tree.body[0].declarations[0],
+							assignment: {
+								kind: "ReferenceAssignment",
+								tree: tree.body[0].declarations[0].id,
+								reference: {
+									kind: "SymbolReference",
+									tree: tree.body[0].declarations[0].id,
+									symbol: {
+										name: "a",
+										kind: "var",
+										declaration: tree.body[0].declarations[0].id
+									}
+								}
+							},
+							init: null
+						},
+						{
+							kind: "VariableDeclarator",
+							tree: tree.body[0].declarations[1],
+							assignment: {
+								kind: "ReferenceAssignment",
+								tree: tree.body[0].declarations[1].id,
+								reference: {
+									kind: "SymbolReference",
+									tree: tree.body[0].declarations[1].id,
+									symbol: {
+										name: "b",
+										kind: "var",
+										declaration: tree.body[0].declarations[1].id
+									}
+								}
+							},
+							init: null
+						}
+					]
+				},
+				{
+					kind: "Expression",
+					tree: tree.body[1],
+					operation: {
+						kind: "ValueAssignment",
+						tree: tree.body[1].expression,
+						assignment: {
+							kind: "ObjectDestructuringAssignment",
+							tree: tree.body[1].expression.left,
+							properties: [
+								{
+									kind: "PropertyDestructuringAssignment",
+									tree: tree.body[1].expression.left.properties[0],
+									valueAssignment: {
+										kind: "ReferenceAssignment",
+										tree: tree.body[1].expression.left.properties[0].value,
+										reference: {
+											kind: "SymbolReference",
+											tree: tree.body[1].expression.left.properties[0].value,
+											symbol: {
+												name: "a",
+												kind: "var",
+												declaration: tree.body[0].declarations[0].id
+											}
+										}
+									}
+								},
+								{
+									kind: "PropertyDestructuringAssignment",
+									tree: tree.body[1].expression.left.properties[1],
+									valueAssignment: {
+										kind: "ReferenceAssignment",
+										tree: tree.body[1].expression.left.properties[1].value,
+										reference: {
+											kind: "SymbolReference",
+											tree: tree.body[1].expression.left.properties[1].value,
+											symbol: {
+												name: "b",
+												kind: "var",
+												declaration: tree.body[0].declarations[1].id
+											}
+										}
+									}
+								}
+							]
+						},
+						value: {
+							kind: "SymbolReference",
+							tree: tree.body[1].expression.right,
+							symbol: undefined
+						}
+					}
+				}
+			]
+		})
+	});
+});
+
 describe('a program containing a function with default parameters', () => {
 	let tree, program;
 

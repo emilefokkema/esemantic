@@ -400,12 +400,21 @@ class AssignmentExpressionVisitor{
 			this.assignmentVisitor = visitor;
 			return useVisitor(visitor);
 		}
+		var visitor = new ExpressionVisitor(this.scope, this.referencer);
+		this.valueVisitor = visitor;
+		return useVisitor(visitor);
+	}
+
+	Pattern(node, useVisitor){
+		if(node === this.tree.left){
+			var visitor = new AssignmentTargetPatternVisitor(this.scope, this.referencer);
+			this.assignmentVisitor = visitor;
+			return useVisitor(visitor);
+		}
+		//todo right side is a pattern that's not an identifier, e.g. 'a.b'
 	}
 
 	Expression(node, useVisitor){
-		if(node === this.tree.left){
-			return; //todo left is an expression that's not a pattern
-		}
 		var visitor = new ExpressionVisitor(this.scope, this.referencer);
 		this.valueVisitor = visitor;
 		return useVisitor(visitor);
