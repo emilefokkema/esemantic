@@ -1924,7 +1924,84 @@ describe('a program containing a variable declaration and an assignment containi
 		program = createProgram(tree);
 	});
 
-	xit('should result in this tree', () => {
-		expect(true).toBe(true);
+	it('should result in this tree', () => {
+		expect(program).toEqual({
+			kind: "Program",
+			tree: tree,
+			operations: [
+				{
+					kind: "VariableDeclaration",
+					tree: tree.body[0],
+					declarators: [
+						{
+							kind: "VariableDeclarator",
+							tree: tree.body[0].declarations[0],
+							assignment: {
+								kind: "ReferenceAssignment",
+								tree: tree.body[0].declarations[0].id,
+								reference: {
+									kind: "SymbolReference",
+									tree: tree.body[0].declarations[0].id,
+									symbol: {
+										name: "a",
+										kind: "var",
+										declaration: tree.body[0].declarations[0].id
+									}
+								}
+							},
+							init: null
+						}
+					]
+				},
+				{
+					kind: "Expression",
+					tree: tree.body[1],
+					operation: {
+						kind: "ValueAssignment",
+						tree: tree.body[1].expression,
+						value: {
+							kind: "MemberReference",
+							tree: tree.body[1].expression.right,
+							object: {
+								kind: "SymbolReference",
+								tree: tree.body[1].expression.right.object,
+								symbol: {
+									name: "a",
+									kind: "var",
+									declaration: tree.body[0].declarations[0].id
+								}
+							},
+							property: {
+								kind: "StaticKey",
+								tree: tree.body[1].expression.right.property,
+								keyName: "c"
+							}
+						},
+						assignment:{
+							kind: "ReferenceAssignment",
+							tree: tree.body[1].expression.left,
+							reference: {
+								kind: "MemberReference",
+								tree: tree.body[1].expression.left,
+								object: {
+									kind: "SymbolReference",
+									tree: tree.body[1].expression.left.object,
+									symbol: {
+										name: "a",
+										kind: "var",
+										declaration: tree.body[0].declarations[0].id
+									}
+								},
+								property: {
+									kind: "StaticKey",
+									tree: tree.body[1].expression.left.property,
+									keyName: "b"
+								}
+							}
+						}
+					}
+				}
+			]
+		});
 	});
 });

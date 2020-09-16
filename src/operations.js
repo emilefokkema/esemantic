@@ -45,6 +45,27 @@ export class RestElementAssignmentOperation extends Operation{
 	}
 }
 
+export class KeyComputationOperation extends Operation{
+
+}
+
+export class StaticKeyOperation extends Operation{
+	constructor(tree, keyName){
+		super(tree);
+		this.keyName = keyName;
+		this.kind = "StaticKey";
+	}
+}
+
+export class MemberReferenceOperation extends Operation{
+	constructor(tree, object, property){
+		super(tree);
+		this.object = object;
+		this.property = property;
+		this.kind = "MemberReference";
+	}
+}
+
 export class SymbolReferenceOperation extends Operation{
 	constructor(tree, symbol) {
 		super(tree);

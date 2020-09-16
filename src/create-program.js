@@ -17,7 +17,9 @@ import {
 	ValueAssignmentOperation,
 	LiteralOperation,
 	ObjectOperation,
-	ObjectPropertyOperation} from './operations'
+	ObjectPropertyOperation,
+	StaticKeyOperation,
+	MemberReferenceOperation} from './operations'
 
 class Symbol{
 	constructor(identifier, kind) {
@@ -319,6 +321,32 @@ class MemberExpressionVisitor{
 		this.tree = tree;
 		this.scope = scope;
 		this.referencer = referencer;
+		this.propertyOperationFn = undefined;
+		this.objectVisitor = undefined;
+	}
+
+	getOperation(){
+		return new MemberReferenceOperation(this.tree, this.objectVisitor.getOperation(), this.propertyOperationFn());
+	}
+
+	Expression(node){
+		
+	}
+
+	Identifier(node, useVisitor){
+		if(node === this.tree.property){
+			if(this.tree.computed){
+				var visitor = new ExpressionVisitor(this.scope, this.referencer);
+				this.propertyOperationFn = () => visitor.getOperation();
+				return useVisitor(visitor);
+			}else{
+				this.propertyOperationFn = () => new StaticKeyOperation(node, node.name);
+			}
+		}else{
+			var visitor = new ExpressionVisitor(this.scope, this.referencer);
+			this.objectVisitor = visitor;
+			return useVisitor(visitor);
+		}
 	}
 }
 
@@ -443,7 +471,6 @@ class AssignmentExpressionVisitor{
 			this.assignmentVisitor = visitor;
 			return useVisitor(visitor);
 		}
-		//todo right side is a pattern that's not an identifier, e.g. 'a.b'
 	}
 
 	Expression(node, useVisitor){
