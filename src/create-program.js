@@ -147,6 +147,13 @@ class AssignmentTargetPatternVisitor{
 			return new ReferenceAssignmentOperation(node, symbolReference);
 		};
 	}
+	MemberExpression(node){
+		var visitor = new MemberExpressionVisitor(node, this.scope, this.referencer);
+		this.operationFn = () => {
+			return new ReferenceAssignmentOperation(node, visitor.getOperation());
+		};
+		return visitor;
+	}
 	RestElement(node){
 		var visitor = new AssignmentTargetPatternVisitor(this.scope, this.referencer);
 		this.operationFn = () => {
@@ -307,6 +314,14 @@ class FunctionDeclarationVisitor{
 	}
 }
 
+class MemberExpressionVisitor{
+	constructor(tree, scope, referencer) {
+		this.tree = tree;
+		this.scope = scope;
+		this.referencer = referencer;
+	}
+}
+
 class ExpressionVisitor{
 	constructor(scope, referencer) {
 		this.scope = scope;
@@ -325,6 +340,12 @@ class ExpressionVisitor{
 
 	Literal(node){
 		this.operationFn = () => new LiteralOperation(node);
+	}
+
+	MemberExpression(node){
+		var visitor = new MemberExpressionVisitor(node, this.scope, this.referencer);
+		this.operationFn = () => visitor.getOperation();
+		return visitor;
 	}
 
 	AssignmentExpression(node){
@@ -395,6 +416,17 @@ class AssignmentExpressionVisitor{
 	}
 
 	Identifier(node, useVisitor){
+		if(node === this.tree.left){
+			var visitor = new AssignmentTargetPatternVisitor(this.scope, this.referencer);
+			this.assignmentVisitor = visitor;
+			return useVisitor(visitor);
+		}
+		var visitor = new ExpressionVisitor(this.scope, this.referencer);
+		this.valueVisitor = visitor;
+		return useVisitor(visitor);
+	}
+
+	MemberExpression(node, useVisitor){
 		if(node === this.tree.left){
 			var visitor = new AssignmentTargetPatternVisitor(this.scope, this.referencer);
 			this.assignmentVisitor = visitor;

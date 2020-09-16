@@ -1840,3 +1840,91 @@ describe('a program containing a function with default parameters', () => {
 		});
 	});
 });
+
+describe('a program containing a variable declaration and an assignment containing member expressions', () => {
+	let tree, program;
+
+	beforeEach(() => {
+		//for script `var a;a.b = a.c;`
+		tree = {
+			"type": "Program",
+			"start": 0,
+			"end": 17,
+			"body": [
+			  {
+				"type": "VariableDeclaration",
+				"start": 0,
+				"end": 6,
+				"declarations": [
+				  {
+					"type": "VariableDeclarator",
+					"start": 4,
+					"end": 5,
+					"id": {
+					  "type": "Identifier",
+					  "start": 4,
+					  "end": 5,
+					  "name": "a"
+					},
+					"init": null
+				  }
+				],
+				"kind": "var"
+			  },
+			  {
+				"type": "ExpressionStatement",
+				"start": 6,
+				"end": 16,
+				"expression": {
+				  "type": "AssignmentExpression",
+				  "start": 6,
+				  "end": 15,
+				  "operator": "=",
+				  "left": {
+					"type": "MemberExpression",
+					"start": 6,
+					"end": 9,
+					"object": {
+					  "type": "Identifier",
+					  "start": 6,
+					  "end": 7,
+					  "name": "a"
+					},
+					"property": {
+					  "type": "Identifier",
+					  "start": 8,
+					  "end": 9,
+					  "name": "b"
+					},
+					"computed": false
+				  },
+				  "right": {
+					"type": "MemberExpression",
+					"start": 12,
+					"end": 15,
+					"object": {
+					  "type": "Identifier",
+					  "start": 12,
+					  "end": 13,
+					  "name": "a"
+					},
+					"property": {
+					  "type": "Identifier",
+					  "start": 14,
+					  "end": 15,
+					  "name": "c"
+					},
+					"computed": false
+				  }
+				}
+			  }
+			],
+			"sourceType": "script"
+		  };
+		program = createProgram(tree);
+	});
+
+	xit('should result in this tree', () => {
+		expect(true).toBe(true);
+	});
+});
