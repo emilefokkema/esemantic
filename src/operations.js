@@ -46,7 +46,11 @@ export class RestElementAssignmentOperation extends Operation{
 }
 
 export class KeyComputationOperation extends Operation{
-
+	constructor(tree, expression){
+		super(tree);
+		this.expression = expression;
+		this.kind = "KeyComputation";
+	}
 }
 
 export class StaticKeyOperation extends Operation{

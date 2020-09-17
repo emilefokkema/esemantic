@@ -19,7 +19,8 @@ import {
 	ObjectOperation,
 	ObjectPropertyOperation,
 	StaticKeyOperation,
-	MemberReferenceOperation} from './operations'
+	MemberReferenceOperation,
+	KeyComputationOperation} from './operations'
 
 class Symbol{
 	constructor(identifier, kind) {
@@ -337,7 +338,7 @@ class MemberExpressionVisitor{
 		if(node === this.tree.property){
 			if(this.tree.computed){
 				var visitor = new ExpressionVisitor(this.scope, this.referencer);
-				this.propertyOperationFn = () => visitor.getOperation();
+				this.propertyOperationFn = () => new KeyComputationOperation(node, visitor.getOperation());
 				return useVisitor(visitor);
 			}else{
 				this.propertyOperationFn = () => new StaticKeyOperation(node, node.name);
