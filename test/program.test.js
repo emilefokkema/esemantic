@@ -502,6 +502,11 @@ describe('a program with a function with an object pattern as parameter', () => 
 													declaration: tree.body[0].params[0].properties[0].value
 												}
 											}
+										},
+										key: {
+											kind: "StaticKey",
+											tree: tree.body[0].params[0].properties[0].key,
+											keyName: "b"
 										}
 									},
 									{
@@ -519,6 +524,11 @@ describe('a program with a function with an object pattern as parameter', () => 
 													kind: "var"
 												}
 											}
+										},
+										key: {
+											kind: "StaticKey",
+											tree: tree.body[0].params[0].properties[1].key,
+											keyName: "d"
 										}
 									}
 								]
@@ -939,6 +949,11 @@ describe('a program with a function with as assignment pattern with an object pa
 														declaration: tree.body[0].params[0].left.properties[0].value
 													}
 												}
+											},
+											key: {
+												kind: "StaticKey",
+												tree: tree.body[0].params[0].left.properties[0].key,
+												keyName: "b"
 											}
 										}
 									]
@@ -1121,6 +1136,11 @@ describe('a program containing a variable declarator with an object pattern', ()
 													kind: "var"
 												}
 											}
+										},
+										key: {
+											kind: "StaticKey",
+											tree: tree.body[0].declarations[0].id.properties[0].key,
+											keyName: "a"
 										}
 									},
 									{
@@ -1138,6 +1158,11 @@ describe('a program containing a variable declarator with an object pattern', ()
 													kind: "var"
 												}
 											}
+										},
+										key: {
+											kind: "StaticKey",
+											tree: tree.body[0].declarations[0].id.properties[1].key,
+											keyName: "c"
 										}
 									}
 								]
@@ -1480,6 +1505,11 @@ describe('a program containing a variable declaration and a destructuring assign
 												declaration: tree.body[0].declarations[0].id
 											}
 										}
+									},
+									key: {
+										kind: "StaticKey",
+										tree: tree.body[1].expression.left.properties[0].key,
+										keyName: "a"
 									}
 								},
 								{
@@ -1497,6 +1527,11 @@ describe('a program containing a variable declaration and a destructuring assign
 												declaration: tree.body[0].declarations[1].id
 											}
 										}
+									},
+									key: {
+										kind: "StaticKey",
+										tree: tree.body[1].expression.left.properties[1].key,
+										keyName: "b"
 									}
 								}
 							]

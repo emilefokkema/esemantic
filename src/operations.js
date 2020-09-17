@@ -21,9 +21,10 @@ export class ArrayDestructuringAssignmentOperation extends Operation{
 }
 
 export class PropertyDestructuringAssignmentOperation extends Operation{
-	constructor(tree, assignmentOperation){
+	constructor(tree, assignmentOperation, key){
 		super(tree);
 		this.valueAssignment = assignmentOperation;
+		this.key = key;
 		this.kind = "PropertyDestructuringAssignment";
 	}
 }

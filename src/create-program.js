@@ -230,19 +230,30 @@ class PropertyAssignmentVisitor{
 		this.referencer = referencer;
 		this.tree = tree;
 		this.valueVisitor = undefined;
+		this.keyOperationFn = undefined;
 	}
 
 	getOperation(){
-		return new PropertyDestructuringAssignmentOperation(this.tree, this.valueVisitor.getOperation())
+		return new PropertyDestructuringAssignmentOperation(this.tree, this.valueVisitor.getOperation(), this.keyOperationFn())
 	}
 
-	Pattern(node, useVisitor){
+	//TODO a pattern that's not an identifier
+
+	Identifier(node, useVisitor){
 		if(node === this.tree.key){
-			return;
+			if(this.tree.computed){
+				//TODO test this branch
+				var visitor = new ExpressionVisitor(this.scope, this.referencer);
+				this.keyOperationFn = () => new KeyComputationOperation(node, visitor.getOperation());
+				return useVisitor(visitor);
+			}else{
+				this.keyOperationFn = () => new StaticKeyOperation(node, node.name);
+			}
+		}else{
+			var visitor = new AssignmentTargetPatternVisitor(this.scope, this.referencer);
+			this.valueVisitor = visitor;
+			return useVisitor(visitor);
 		}
-		var visitor = new AssignmentTargetPatternVisitor(this.scope, this.referencer);
-		this.valueVisitor = visitor;
-		return useVisitor(visitor);
 	}
 }
 
@@ -331,7 +342,7 @@ class MemberExpressionVisitor{
 	}
 
 	Expression(node){
-		
+		//TODO an expression that's not an identifier
 	}
 
 	Identifier(node, useVisitor){
