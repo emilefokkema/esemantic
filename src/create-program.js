@@ -237,7 +237,22 @@ class PropertyAssignmentVisitor{
 		return new PropertyDestructuringAssignmentOperation(this.tree, this.valueVisitor.getOperation(), this.keyOperationFn())
 	}
 
-	//TODO a pattern that's not an identifier
+	Pattern(node, useVisitor){
+		if(node === this.tree.key){
+			if(this.tree.computed){
+				//TODO test this branch
+				var visitor = new ExpressionVisitor(this.scope, this.referencer);
+				this.keyOperationFn = () => new KeyComputationOperation(node, visitor.getOperation());
+				return useVisitor(visitor);
+			}else{
+				// should never happen, because a uncomputed key cannot be any other pattern than an identifier
+			}
+		}else{
+			var visitor = new AssignmentTargetPatternVisitor(this.scope, this.referencer);
+			this.valueVisitor = visitor;
+			return useVisitor(visitor);
+		}
+	}
 
 	Identifier(node, useVisitor){
 		if(node === this.tree.key){

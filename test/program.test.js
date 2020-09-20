@@ -2194,3 +2194,181 @@ describe('a program containing a variable declaration and a computed member expr
 		})
 	});
 });
+
+describe('a program containing a variable declaration and and assignment to an object pattern with a property with a pattern as value', () => {
+	let tree, program;
+
+	beforeEach(() => {
+		//for script `var b;({a: [...b]} = c)`
+		tree = {
+			"type": "Program",
+			"start": 0,
+			"end": 24,
+			"body": [
+			  {
+				"type": "VariableDeclaration",
+				"start": 0,
+				"end": 6,
+				"declarations": [
+				  {
+					"type": "VariableDeclarator",
+					"start": 4,
+					"end": 5,
+					"id": {
+					  "type": "Identifier",
+					  "start": 4,
+					  "end": 5,
+					  "name": "b"
+					},
+					"init": null
+				  }
+				],
+				"kind": "var"
+			  },
+			  {
+				"type": "ExpressionStatement",
+				"start": 6,
+				"end": 23,
+				"expression": {
+				  "type": "AssignmentExpression",
+				  "start": 7,
+				  "end": 22,
+				  "operator": "=",
+				  "left": {
+					"type": "ObjectPattern",
+					"start": 7,
+					"end": 18,
+					"properties": [
+					  {
+						"type": "Property",
+						"start": 8,
+						"end": 17,
+						"method": false,
+						"shorthand": false,
+						"computed": false,
+						"key": {
+						  "type": "Identifier",
+						  "start": 8,
+						  "end": 9,
+						  "name": "a"
+						},
+						"value": {
+						  "type": "ArrayPattern",
+						  "start": 11,
+						  "end": 17,
+						  "elements": [
+							{
+							  "type": "RestElement",
+							  "start": 12,
+							  "end": 16,
+							  "argument": {
+								"type": "Identifier",
+								"start": 15,
+								"end": 16,
+								"name": "b"
+							  }
+							}
+						  ]
+						},
+						"kind": "init"
+					  }
+					]
+				  },
+				  "right": {
+					"type": "Identifier",
+					"start": 21,
+					"end": 22,
+					"name": "c"
+				  }
+				}
+			  }
+			],
+			"sourceType": "script"
+		  }
+		program = createProgram(tree);
+	});
+
+	it('should result in this tree', () => {
+		expect(program).toEqual({
+			kind: "Program",
+			tree: tree,
+			operations: [
+				{
+					kind: "VariableDeclaration",
+					tree: tree.body[0],
+					declarators: [
+						{
+							kind: "VariableDeclarator",
+							tree: tree.body[0].declarations[0],
+							assignment: {
+								kind: "ReferenceAssignment",
+								tree: tree.body[0].declarations[0].id,
+								reference: {
+									kind: "SymbolReference",
+									tree: tree.body[0].declarations[0].id,
+									symbol: {
+										name: "b",
+										kind: "var",
+										declaration: tree.body[0].declarations[0].id
+									}
+								}
+							},
+							init: null
+						}
+					]
+				},
+				{
+					kind: "Expression",
+					tree: tree.body[1],
+					operation: {
+						kind: "ValueAssignment",
+						tree: tree.body[1].expression,
+						value: {
+							kind: "SymbolReference",
+							tree: tree.body[1].expression.right,
+							symbol: undefined
+						},
+						assignment: {
+							kind: "ObjectDestructuringAssignment",
+							tree: tree.body[1].expression.left,
+							properties: [
+								{
+									kind: "PropertyDestructuringAssignment",
+									tree: tree.body[1].expression.left.properties[0],
+									key: {
+										kind: "StaticKey",
+										tree: tree.body[1].expression.left.properties[0].key,
+										keyName: "a"
+									},
+									valueAssignment: {
+										kind: "ArrayDestructuringAssignment",
+										tree: tree.body[1].expression.left.properties[0].value,
+										elements: [
+											{
+												kind: "RestElementAssignment",
+												tree: tree.body[1].expression.left.properties[0].value.elements[0],
+												assignment: {
+													kind: "ReferenceAssignment",
+													tree: tree.body[1].expression.left.properties[0].value.elements[0].argument,
+													reference: {
+														kind: "SymbolReference",
+														tree: tree.body[1].expression.left.properties[0].value.elements[0].argument,
+														symbol: {
+															name: "b",
+															kind: "var",
+															declaration: tree.body[0].declarations[0].id
+														}
+													}
+												}
+											}
+										]
+									}
+								}
+							]
+						}
+					}
+				}
+			]
+		});
+	});
+});
