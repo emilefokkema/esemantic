@@ -2372,3 +2372,356 @@ describe('a program containing a variable declaration and and assignment to an o
 		});
 	});
 });
+
+describe('a program containing a variable declaration with an object pattern with a computed property', () => {
+	let tree, program;
+
+	beforeEach(() => {
+		//for script `var a;var {[a.b]:c} = d;`
+		tree = {
+			"type": "Program",
+			"start": 0,
+			"end": 25,
+			"body": [
+			  {
+				"type": "VariableDeclaration",
+				"start": 0,
+				"end": 6,
+				"declarations": [
+				  {
+					"type": "VariableDeclarator",
+					"start": 4,
+					"end": 5,
+					"id": {
+					  "type": "Identifier",
+					  "start": 4,
+					  "end": 5,
+					  "name": "a"
+					},
+					"init": null
+				  }
+				],
+				"kind": "var"
+			  },
+			  {
+				"type": "VariableDeclaration",
+				"start": 6,
+				"end": 24,
+				"declarations": [
+				  {
+					"type": "VariableDeclarator",
+					"start": 10,
+					"end": 23,
+					"id": {
+					  "type": "ObjectPattern",
+					  "start": 10,
+					  "end": 19,
+					  "properties": [
+						{
+						  "type": "Property",
+						  "start": 11,
+						  "end": 18,
+						  "method": false,
+						  "shorthand": false,
+						  "computed": true,
+						  "key": {
+							"type": "MemberExpression",
+							"start": 12,
+							"end": 15,
+							"object": {
+							  "type": "Identifier",
+							  "start": 12,
+							  "end": 13,
+							  "name": "a"
+							},
+							"property": {
+							  "type": "Identifier",
+							  "start": 14,
+							  "end": 15,
+							  "name": "b"
+							},
+							"computed": false
+						  },
+						  "value": {
+							"type": "Identifier",
+							"start": 17,
+							"end": 18,
+							"name": "c"
+						  },
+						  "kind": "init"
+						}
+					  ]
+					},
+					"init": {
+					  "type": "Identifier",
+					  "start": 22,
+					  "end": 23,
+					  "name": "d"
+					}
+				  }
+				],
+				"kind": "var"
+			  }
+			],
+			"sourceType": "script"
+		  };
+		program = createProgram(tree);
+	});
+
+	it('should result in this tree', () => {
+		expect(program).toEqual({
+			kind: "Program",
+			tree: tree,
+			operations: [
+				{
+					kind: "VariableDeclaration",
+					tree: tree.body[0],
+					declarators: [
+						{
+							kind: "VariableDeclarator",
+							tree: tree.body[0].declarations[0],
+							assignment: {
+								kind: "ReferenceAssignment",
+								tree: tree.body[0].declarations[0].id,
+								reference: {
+									kind: "SymbolReference",
+									tree: tree.body[0].declarations[0].id,
+									symbol: {
+										name: "a",
+										kind: "var",
+										declaration: tree.body[0].declarations[0].id
+									}
+								}
+							},
+							init: null
+						}
+					]
+				},
+				{
+					kind: "VariableDeclaration",
+					tree: tree.body[1],
+					declarators: [
+						{
+							kind: "VariableDeclarator",
+							tree: tree.body[1].declarations[0],
+							assignment: {
+								kind: "ObjectDestructuringAssignment",
+								tree: tree.body[1].declarations[0].id,
+								properties: [
+									{
+										kind: "PropertyDestructuringAssignment",
+										tree: tree.body[1].declarations[0].id.properties[0],
+										valueAssignment: {
+											kind: "ReferenceAssignment",
+											tree: tree.body[1].declarations[0].id.properties[0].value,
+											reference: {
+												kind: "SymbolReference",
+												tree: tree.body[1].declarations[0].id.properties[0].value,
+												symbol: {
+													name: "c",
+													kind: "var",
+													declaration: tree.body[1].declarations[0].id.properties[0].value
+												}
+											}
+										},
+										key: {
+											kind: "KeyComputation",
+											tree: tree.body[1].declarations[0].id.properties[0].key,
+											expression: {
+												kind: "MemberReference",
+												tree: tree.body[1].declarations[0].id.properties[0].key,
+												object: {
+													kind: "SymbolReference",
+													tree: tree.body[1].declarations[0].id.properties[0].key.object,
+													symbol: {
+														name: "a",
+														kind: "var",
+														declaration: tree.body[0].declarations[0].id
+													}
+												},
+												property: {
+													kind: "StaticKey",
+													tree: tree.body[1].declarations[0].id.properties[0].key.property,
+													keyName: "b"
+												}
+											}
+										}
+									}
+								]
+							},
+							init: {
+								kind: "SymbolReference",
+								tree: tree.body[1].declarations[0].init,
+								symbol: undefined
+							}
+						}
+					]
+				}
+			]
+		});
+	});
+});
+
+describe('a program containing a variable declaration with an object pattern with a property computed by an identifier', () => {
+	let tree, program;
+
+	beforeEach(() => {
+		//for script `var a;var {[b]:c} = d;`
+		tree = {
+			"type": "Program",
+			"start": 0,
+			"end": 23,
+			"body": [
+			  {
+				"type": "VariableDeclaration",
+				"start": 0,
+				"end": 6,
+				"declarations": [
+				  {
+					"type": "VariableDeclarator",
+					"start": 4,
+					"end": 5,
+					"id": {
+					  "type": "Identifier",
+					  "start": 4,
+					  "end": 5,
+					  "name": "a"
+					},
+					"init": null
+				  }
+				],
+				"kind": "var"
+			  },
+			  {
+				"type": "VariableDeclaration",
+				"start": 6,
+				"end": 22,
+				"declarations": [
+				  {
+					"type": "VariableDeclarator",
+					"start": 10,
+					"end": 21,
+					"id": {
+					  "type": "ObjectPattern",
+					  "start": 10,
+					  "end": 17,
+					  "properties": [
+						{
+						  "type": "Property",
+						  "start": 11,
+						  "end": 16,
+						  "method": false,
+						  "shorthand": false,
+						  "computed": true,
+						  "key": {
+							"type": "Identifier",
+							"start": 12,
+							"end": 13,
+							"name": "b"
+						  },
+						  "value": {
+							"type": "Identifier",
+							"start": 15,
+							"end": 16,
+							"name": "c"
+						  },
+						  "kind": "init"
+						}
+					  ]
+					},
+					"init": {
+					  "type": "Identifier",
+					  "start": 20,
+					  "end": 21,
+					  "name": "d"
+					}
+				  }
+				],
+				"kind": "var"
+			  }
+			],
+			"sourceType": "script"
+		  };
+		program = createProgram(tree)
+	});
+
+	it('should result in this tree', () => {
+		expect(program).toEqual({
+			kind: "Program",
+			tree: tree,
+			operations: [
+				{
+					kind: "VariableDeclaration",
+					tree: tree.body[0],
+					declarators: [
+						{
+							kind: "VariableDeclarator",
+							tree: tree.body[0].declarations[0],
+							assignment: {
+								kind: "ReferenceAssignment",
+								tree: tree.body[0].declarations[0].id,
+								reference: {
+									kind: "SymbolReference",
+									tree: tree.body[0].declarations[0].id,
+									symbol: {
+										name: "a",
+										kind: "var",
+										declaration: tree.body[0].declarations[0].id
+									}
+								}
+							},
+							init: null
+						}
+					]
+				},
+				{
+					kind: "VariableDeclaration",
+					tree: tree.body[1],
+					declarators: [
+						{
+							kind: "VariableDeclarator",
+							tree: tree.body[1].declarations[0],
+							assignment: {
+								kind: "ObjectDestructuringAssignment",
+								tree: tree.body[1].declarations[0].id,
+								properties: [
+									{
+										kind: "PropertyDestructuringAssignment",
+										tree: tree.body[1].declarations[0].id.properties[0],
+										valueAssignment: {
+											kind: "ReferenceAssignment",
+											tree: tree.body[1].declarations[0].id.properties[0].value,
+											reference: {
+												kind: "SymbolReference",
+												tree: tree.body[1].declarations[0].id.properties[0].value,
+												symbol: {
+													name: "c",
+													kind: "var",
+													declaration: tree.body[1].declarations[0].id.properties[0].value
+												}
+											}
+										},
+										key: {
+											kind: "KeyComputation",
+											tree: tree.body[1].declarations[0].id.properties[0].key,
+											expression: {
+												kind: "SymbolReference",
+												tree: tree.body[1].declarations[0].id.properties[0].key,
+												symbol: undefined
+											}
+										}
+									}
+								]
+							},
+							init: {
+								kind: "SymbolReference",
+								tree: tree.body[1].declarations[0].init,
+								symbol: undefined
+							}
+						}
+					]
+				}
+			]
+		});
+	});
+});

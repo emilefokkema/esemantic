@@ -125,6 +125,9 @@ class VariableDeclaratorVisitor{
 			this.idVisitor = visitor;
 			return useVisitor(visitor);
 		}
+		var visitor = new ExpressionVisitor(this.scope, this.initReferencer);
+		this.initVisitor = visitor;
+		return useVisitor(visitor);
 	}
 
 	Expression(node, useVisitor){
@@ -240,7 +243,6 @@ class PropertyAssignmentVisitor{
 	Pattern(node, useVisitor){
 		if(node === this.tree.key){
 			if(this.tree.computed){
-				//TODO test this branch
 				var visitor = new ExpressionVisitor(this.scope, this.referencer);
 				this.keyOperationFn = () => new KeyComputationOperation(node, visitor.getOperation());
 				return useVisitor(visitor);
@@ -257,7 +259,6 @@ class PropertyAssignmentVisitor{
 	Identifier(node, useVisitor){
 		if(node === this.tree.key){
 			if(this.tree.computed){
-				//TODO test this branch
 				var visitor = new ExpressionVisitor(this.scope, this.referencer);
 				this.keyOperationFn = () => new KeyComputationOperation(node, visitor.getOperation());
 				return useVisitor(visitor);
